@@ -1,23 +1,26 @@
-//
-// Created by gonca on 26/10/2022.
-//
+#ifndef ESTUDANTE_H
+#define ESTUDANTE_H
 
-#ifndef PROJETO_AED_STUDENT_H
-#define PROJETO_AED_STUDENT_H
 #include<list>
 #include<string>
 #include "ucturma.h"
+
 using namespace std;
-class Student{
+
+class Student {
     public:
-        void student(int number, string name, list<UCTURMA> turmas); // Construtor
-        string getName();
-        int getNumber();
-        list<UCTURMA> getTurmas();
+        // constructor
+        Student(int code, const string& name, list<UcTurma> turmas);
+
+        // accessors
+        string getName() const;
+        int getCode() const;
+        list<UcTurma> getTurmas() const;
 
     private:
-        int number;
-        string name;
-        list<UCTURMA> turmas;
+        int code_;
+        string name_;
+        list<UcTurma> turmas_;
 };
+
 #endif

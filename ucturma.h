@@ -1,19 +1,23 @@
-//
-// Created by gonca on 26/10/2022.
-//
+#ifndef UCTURMA_H
+#define UCTURMA_H
 
-#ifndef PROJETO_AED_UCTURMA_H
-#define PROJETO_AED_UCTURMA_H
 #include<string>
+
 using namespace std;
-class UCTURMA{
+
+class UcTurma {
     public:
-        void ucTurma(string codUC, string codTurma);// Construtor
-        string getCodUC();
-        string getCodTurma();
+        // constructor
+        UcTurma(const string& codUc, const string& codTurma);
+
+        // accessors
+        string getCodUc() const;
+        string getCodTurma() const;
+
     private:
-        string codUC;
-        string codTurma;
+        string codUc_;
+        string codTurma_;
 
 };
-#endif //PROJETO_AED_UCTURMA_H
+
+#endif

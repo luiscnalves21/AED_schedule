@@ -1,10 +1,14 @@
-//
-// Created by gonca on 26/10/2022.
-//
 #include "ucturma.h"
 
-void UCTURMA::ucTurma(string codUC, string codTurma) {this->codUC = codUC, this->codTurma = codTurma;}
+UcTurma::UcTurma(const string& codUc, const string& codTurma) {
+    codUc_ = codUc;
+    codTurma_ = codTurma;
+}
 
-string UCTURMA::getCodTurma(){return this->codTurma;}
+string UcTurma::getCodUc() const {
+    return codUc_;
+}
 
-string UCTURMA::getCodUC(){return this->codUC;}
+string UcTurma::getCodTurma() const {
+    return codTurma_;
+}

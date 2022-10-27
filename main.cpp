@@ -6,7 +6,7 @@
 #include<queue>
 
 int main(){
-    set<Student> students;
+    set<Estudante> students;
     vector<turmaH> horario;
 
     return 0;

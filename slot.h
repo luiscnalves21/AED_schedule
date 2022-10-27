@@ -1,24 +1,26 @@
-//
-// Created by gonca on 26/10/2022.
-//
+#ifndef SLOT_H
+#define SLOT_H
 
-#ifndef PROJETO_AED_SLOT_H
-#define PROJETO_AED_SLOT_H
 #include<string>
+
 using namespace std;
 
-class slot {
+class Slot {
     public:
-        void Slot(int dia, double horainicio, double duration, string tipo); //Construtor
-        int getDia();
-        double getHorainicio();
-        double getHorafim();
-        string getTipo();
+        // constructor
+        Slot(int dia, double horainicio, double duration, const string& tipo);
+
+        // accessors
+        int getDia() const;
+        double getHoraInicio() const;
+        double getHoraFim() const;
+        string getTipo() const;
+
     private:
-        int dia;
-        double horainicio;
-        double horafim;
-        string tipo;
+        int dia_;
+        double horaInicio_;
+        double horaFim_;
+        string tipo_;
 };
 
-#endif //PROJETO_AED_SLOT_H
+#endif

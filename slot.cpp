@@ -1,11 +1,26 @@
 #include "slot.h"
 
-void slot::Slot(int dia, double horainicio, double duration, std::string tipo) {this->dia = dia, this->horainicio = horainicio, this->horafim = (horainicio + duration), this->tipo = tipo;}
+using namespace std;
 
-int slot::getDia() {return this->dia;}
+Slot::Slot(int dia, double horainicio, double duration, const string& tipo) {
+    dia_ = dia;
+    horaInicio_ = horainicio;
+    horaFim_ = (horainicio + duration);
+    tipo_ = tipo;
+}
 
-double slot::getHorafim() {return this->horafim;}
+int Slot::getDia() const {
+    return dia_;
+}
 
-double slot::getHorainicio() {return this->horainicio;}
+double Slot::getHoraInicio() const {
+    return horaInicio_;
+}
 
-string slot::getTipo() {return this->tipo;}
+double Slot::getHoraFim() const {
+    return horaFim_;
+}
+
+string Slot::getTipo() const {
+    return tipo_;
+}

@@ -1,12 +1,21 @@
-
-// Created by gonca on 26/10/2022.
-
 #include "student.h"
 
-void Student::student(int number, std::string name, list<UCTURMA> turmas) {this->number = number, this->name = name, this->turmas = turmas;}
+using namespace std;
 
-std::string Student::getName() {return this->name;}
+Student::Student(int code, const string& name, list<UcTurma> turmas) {
+    code_ = code;
+    name_ = name;
+    turmas_ = turmas;
+    }
 
-int Student::getNumber() {return this->number;}
+string Student::getName() const {
+    return name_;
+}
 
-list<UCTURMA> Student::getTurmas() {return this->turmas;}
+int Student::getCode() const {
+    return code_;
+}
+
+list<UcTurma> Student::getTurmas() const {
+    return turmas_;
+}

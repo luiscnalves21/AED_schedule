@@ -1,24 +1,26 @@
-//
-// Created by gonca on 26/10/2022.
-//
+#ifndef TURMAH_H
+#define TURMAH_H
 
-#ifndef PROJETO_AED_TURMAH_H
-#define PROJETO_AED_TURMAH_H
 #include<string>
 #include<list>
 #include"slot.h"
+
 using namespace std;
-class turmaH{
+
+class TurmaH{
     public:
-        void TurmaH(string codUC, string codTurma, list<slot> horarioUCturma);//Construtor
-        string getCodUC();
-        string getCodTurma();
-        list<slot> getHorarioUCTurma();
+        // constructor
+        TurmaH(const string& codUc, const string& codTurma, list<Slot> horarioUCturma);
+        
+        // accessors
+        string getCodUc() const;
+        string getCodTurma() const;
+        list<Slot> getHorarioUcTurma() const;
+        
     private:
-        string codUC;
-        string codTurma;
-        list<slot> horarioUCturma;
+        string codUc_;
+        string codTurma_;
+        list<Slot> horarioUcTurma_;
 };
 
-
-#endif //PROJETO_AED_TURMAH_H
+#endif
