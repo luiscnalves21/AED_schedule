@@ -8,15 +8,19 @@ using namespace std;
 class UcTurma {
     public:
         // constructor
-        UcTurma(const string& codUc, const string& codTurma);
+        UcTurma(); // default constructor
+        UcTurma(const string& ucCode, const string& classCode);
 
-        // accessors
-        string getCodUc() const;
-        string getCodTurma() const;
+        // getters
+        string getUcCode() const;
+        string getClassCode() const;
 
+        // setters
+        void setUcCode(const string& ucCode);
+        void setClassCode(const string& classCode);
     private:
-        string codUc_;
-        string codTurma_;
+        string ucCode_;
+        string classCode_;
 
 };
 

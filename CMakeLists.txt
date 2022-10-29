@@ -7,4 +7,4 @@ include_directories(.)
 
 add_executable(Projeto_AED
         main.cpp
-        student.h student.cpp ucturma.h ucturma.cpp turmah.cpp turmah.h slot.cpp slot.h src/pedido.cpp include/pedido.h)
+        include/gestaoh.h src/gestaoh.cpp include/pedido.h src/pedido.cpp include/student.h src/student.cpp include/ucturma.h src/ucturma.cpp src/turmah.cpp include/turmah.h src/slot.cpp include/slot.h)

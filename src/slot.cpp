@@ -1,24 +1,24 @@
 #include "../include/slot.h"
 
-Slot::Slot(const string& dia, double horaInicio, double duration, const string& tipo) {
-    dia_ = dia;
-    horaInicio_ = horaInicio;
-    horaFim_ = (horaInicio + duration);
-    tipo_ = tipo;
+Slot::Slot(const string& weekday, double startHour, double duration, const string& type) {
+    weekday_ = weekday;
+    startHour_ = startHour;
+    finalHour_ = (startHour + duration);
+    type_ = type;
 }
 
-string Slot::getDia() const {
-    return dia_;
+string Slot::getWeekday() const {
+    return weekday_;
 }
 
-double Slot::getHoraInicio() const {
-    return horaInicio_;
+double Slot::getStartHour() const {
+    return startHour_;
 }
 
-double Slot::getHoraFim() const {
-    return horaFim_;
+double Slot::getFinalHour() const {
+    return finalHour_;
 }
 
-string Slot::getTipo() const {
-    return tipo_;
+string Slot::getType() const {
+    return type_;
 }

@@ -2,31 +2,30 @@
 
 using namespace std;
 
-Pedido::Pedido(int studentCode, const string& tipo, const string& codTurmaInicial,
-               const string& codTurmaFinal, const string& codUc) {
+Pedido::Pedido(int studentCode, const string& type, const string& initialClassCode, const string& finalClassCode, const string& ucCode) {
     studentCode_ = studentCode;
-    tipo_ = tipo;
-    codTurmaInicial_ = codTurmaInicial;
-    codTurmaFinal_ = codTurmaFinal;
-    codUc_ = codUc;
+    type_ = type;
+    initialClassCode_ = initialClassCode;
+    finalClassCode_ = finalClassCode;
+    ucCode_= ucCode;
 }
 
 int Pedido::getStudentCode() const {
     return studentCode_;
 }
 
-string Pedido::getTipo() const {
-    return tipo_;
+string Pedido::getType() const {
+    return type_;
 }
 
-string Pedido::getCodTurmaInicial() const {
-    return codTurmaInicial_;
+string Pedido::getInitialClassCode() const {
+    return initialClassCode_;
 }
 
-string Pedido::getCodTurmaFinal() const {
-    return codTurmaFinal_;
+string Pedido::getFinalClassCode() const {
+    return finalClassCode_;
 }
 
-string Pedido::getCodUc() const {
-    return codUc_;
+string Pedido::getUcCode() const {
+    return ucCode_;
 }

@@ -8,19 +8,19 @@ using namespace std;
 class Slot {
     public:
         // constructor
-        Slot(const string& dia, double horaInicio, double duration, const string& tipo);
+        Slot(const string& weekday, double startHour, double duration, const string& type);
 
         // accessors
-        string getDia() const;
-        double getHoraInicio() const;
-        double getHoraFim() const;
-        string getTipo() const;
+        string getWeekday() const;
+        double getStartHour() const;
+        double getFinalHour() const;
+        string getType() const;
 
     private:
-        string dia_;
-        double horaInicio_;
-        double horaFim_;
-        string tipo_;
+        string weekday_;
+        double startHour_;
+        double finalHour_;
+        string type_;
 };
 
 #endif

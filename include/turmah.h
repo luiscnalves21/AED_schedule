@@ -4,23 +4,22 @@
 #include <string>
 #include <list>
 #include "slot.h"
+#include "ucturma.h"
 
 using namespace std;
 
-class TurmaH {
+class TurmaH : public UcTurma {
     public:
         // constructor
-        TurmaH(const string& codUc, const string& codTurma, list<Slot> horarioUcTurma);
+        TurmaH(const string& ucCode, const string& classCode, list<Slot> horarioUcClass);
         
         // accessors
-        string getCodUc() const;
-        string getCodTurma() const;
-        list<Slot> getHorarioUcTurma() const;
+        list<Slot> getHorarioUcClass() const;
         
     private:
-        string codUc_;
-        string codTurma_;
-        list<Slot> horarioUcTurma_;
+        string ucCode_; // unidade curricular
+        string classCode_; // turma
+        list<Slot> horarioUcClass_; // horario uc turma
 };
 
 #endif

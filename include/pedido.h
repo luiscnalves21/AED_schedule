@@ -8,23 +8,23 @@ using namespace std;
 class Pedido {
     public:
         // constructor
-        Pedido(int studentCode, const string& tipo, const string& codTurmaInicial, const string& codTurmaFinal, const string& codUc);
+        Pedido(int studentCode, const string& type, const string& initialClassCode, const string& finalClassCode_, const string& ucCode);
 
         // accessors
         int getStudentCode() const;
-        string getTipo() const;
-        string getCodTurmaInicial() const;
-        string getCodTurmaFinal() const;
-        string getCodUc() const;
+        string getType() const;
+        string getInitialClassCode() const;
+        string getFinalClassCode() const;
+        string getUcCode() const;
     private:
         int studentCode_;
-        string tipo_;   /* remover estudante turma/uc
+        string type_;   /* remover estudante turma/uc
                         * adicionar estudante turma/uc
                         * alterar turma/uc estudante
                         * alterar conjunto turmas/ucs estudante */
-        string codTurmaInicial_;
-        string codTurmaFinal_;
-        string codUc_;
+        string initialClassCode_;
+        string finalClassCode_;
+        string ucCode_;
 };
 
 #endif

@@ -1,19 +1,9 @@
 #include "../include/turmah.h"
 
-TurmaH::TurmaH(const string& codUc, const string& codTurma, list<Slot> horarioUcTurma) {
-    codUc_ = codUc;
-    codTurma_ = codTurma;
-    horarioUcTurma_ = horarioUcTurma;
+TurmaH::TurmaH(const string& ucCode, const string& classCode, list<Slot> horarioUcClass) : UcTurma(ucCode, classCode) {
+    horarioUcClass_ = horarioUcClass;
 }
 
-string TurmaH::getCodUc() const {
-    return codUc_;
-}
-
-string TurmaH::getCodTurma() const {
-    return codTurma_;
-}
-
-list<Slot> TurmaH::getHorarioUcTurma() const {
-    return horarioUcTurma_;
+list<Slot> TurmaH::getHorarioUcClass() const {
+    return horarioUcClass_;
 }

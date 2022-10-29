@@ -1,14 +1,27 @@
 #include "../include/ucturma.h"
 
-UcTurma::UcTurma(const string& codUc, const string& codTurma) {
-    codUc_ = codUc;
-    codTurma_ = codTurma;
+UcTurma::UcTurma() {
+    ucCode_ = "";
+    classCode_ = "";
 }
 
-string UcTurma::getCodUc() const {
-    return codUc_;
+UcTurma::UcTurma(const string& ucCode, const string& classCode) {
+    ucCode_ = ucCode;
+    classCode_ = classCode;
 }
 
-string UcTurma::getCodTurma() const {
-    return codTurma_;
+string UcTurma::getUcCode() const {
+    return ucCode_;
+}
+
+string UcTurma::getClassCode() const {
+    return classCode_;
+}
+
+void UcTurma::setUcCode(const string& ucCode) {
+    ucCode_ = ucCode;
+}
+
+void UcTurma::setClassCode(const string& classCode) {
+    classCode_ = classCode;
 }
