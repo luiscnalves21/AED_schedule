@@ -1,7 +1,7 @@
 #ifndef UCTURMA_H
 #define UCTURMA_H
 
-#include<string>
+#include <string>
 
 using namespace std;
 

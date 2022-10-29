@@ -1,7 +1,7 @@
 #ifndef SLOT_H
 #define SLOT_H
 
-#include<string>
+#include <string>
 
 using namespace std;
 

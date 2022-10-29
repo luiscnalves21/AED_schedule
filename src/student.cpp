@@ -1,7 +1,5 @@
 #include "student.h"
 
-using namespace std;
-
 Student::Student(int code, const string& name, list<UcTurma> turmas) {
     code_ = code;
     name_ = name;

@@ -1,9 +1,9 @@
 #ifndef TURMAH_H
 #define TURMAH_H
 
-#include<string>
-#include<list>
-#include"slot.h"
+#include <string>
+#include <list>
+#include "slot.h"
 
 using namespace std;
 

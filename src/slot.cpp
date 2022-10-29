@@ -1,7 +1,5 @@
 #include "slot.h"
 
-using namespace std;
-
 Slot::Slot(int dia, double horainicio, double duration, const string& tipo) {
     dia_ = dia;
     horaInicio_ = horainicio;

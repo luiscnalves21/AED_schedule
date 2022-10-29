@@ -1,8 +1,8 @@
 #ifndef ESTUDANTE_H
 #define ESTUDANTE_H
 
-#include<list>
-#include<string>
+#include <list>
+#include <string>
 #include "ucturma.h"
 
 using namespace std;

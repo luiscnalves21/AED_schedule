@@ -1,7 +1,5 @@
 #include "turmah.h"
 
-using namespace std;
-
 TurmaH::TurmaH(const string& codUc, const string& codTurma, list<Slot> horarioUcTurma) {
     codUc_ = codUc;
     codTurma_ = codTurma;
