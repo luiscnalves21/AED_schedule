@@ -8,7 +8,7 @@ using namespace std;
 class Slot {
     public:
         // constructor
-        Slot(int dia, double horainicio, double duration, const string& tipo);
+        Slot(int dia, double horaInicio, double duration, const string& tipo);
 
         // accessors
         int getDia() const;

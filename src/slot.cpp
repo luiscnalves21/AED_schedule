@@ -1,9 +1,9 @@
-#include "slot.h"
+#include "../include/slot.h"
 
-Slot::Slot(int dia, double horainicio, double duration, const string& tipo) {
+Slot::Slot(int dia, double horaInicio, double duration, const string& tipo) {
     dia_ = dia;
-    horaInicio_ = horainicio;
-    horaFim_ = (horainicio + duration);
+    horaInicio_ = horaInicio;
+    horaFim_ = (horaInicio + duration);
     tipo_ = tipo;
 }
 

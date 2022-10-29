@@ -1,4 +1,4 @@
-#include "ucturma.h"
+#include "../include/ucturma.h"
 
 UcTurma::UcTurma(const string& codUc, const string& codTurma) {
     codUc_ = codUc;

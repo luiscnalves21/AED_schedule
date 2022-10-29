@@ -1,4 +1,4 @@
-#include "turmah.h"
+#include "../include/turmah.h"
 
 TurmaH::TurmaH(const string& codUc, const string& codTurma, list<Slot> horarioUcTurma) {
     codUc_ = codUc;

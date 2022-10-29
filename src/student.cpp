@@ -1,4 +1,4 @@
-#include "student.h"
+#include "../include/student.h"
 
 Student::Student(int code, const string& name, list<UcTurma> turmas) {
     code_ = code;

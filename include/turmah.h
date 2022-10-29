@@ -7,10 +7,10 @@
 
 using namespace std;
 
-class TurmaH{
+class TurmaH {
     public:
         // constructor
-        TurmaH(const string& codUc, const string& codTurma, list<Slot> horarioUCturma);
+        TurmaH(const string& codUc, const string& codTurma, list<Slot> horarioUcTurma);
         
         // accessors
         string getCodUc() const;
