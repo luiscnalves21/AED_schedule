@@ -1,13 +1,13 @@
 #include "../include/slot.h"
 
-Slot::Slot(int dia, double horaInicio, double duration, const string& tipo) {
+Slot::Slot(const string& dia, double horaInicio, double duration, const string& tipo) {
     dia_ = dia;
     horaInicio_ = horaInicio;
     horaFim_ = (horaInicio + duration);
     tipo_ = tipo;
 }
 
-int Slot::getDia() const {
+string Slot::getDia() const {
     return dia_;
 }
 

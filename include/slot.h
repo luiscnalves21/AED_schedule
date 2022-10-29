@@ -8,16 +8,16 @@ using namespace std;
 class Slot {
     public:
         // constructor
-        Slot(int dia, double horaInicio, double duration, const string& tipo);
+        Slot(const string& dia, double horaInicio, double duration, const string& tipo);
 
         // accessors
-        int getDia() const;
+        string getDia() const;
         double getHoraInicio() const;
         double getHoraFim() const;
         string getTipo() const;
 
     private:
-        int dia_;
+        string dia_;
         double horaInicio_;
         double horaFim_;
         string tipo_;
