@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Pedido::Pedido(const string &tipo, int turma, const string &uc) {
+Pedido::Pedido(const string &tipo, const string& turma, const string &uc) {
     tipo_ = tipo;
     turma_ = turma;
     uc_ = uc;
@@ -12,7 +12,7 @@ string Pedido::getTipo() const {
     return tipo_;
 }
 
-int Pedido::getTurma() const {
+string Pedido::getTurma() const {
     return turma_;
 }
 

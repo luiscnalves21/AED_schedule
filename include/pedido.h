@@ -8,18 +8,18 @@ using namespace std;
 class Pedido {
     public:
         // constructor
-        Pedido(const string& tipo, int turma, const string& uc);
+        Pedido(const string& tipo, const string& turma, const string& uc);
 
         // accessors
         string getTipo() const;
-        int getTurma() const;
+        string getTurma() const;
         string getUc() const;
     private:
         string tipo_;   /* remover estudante turma/uc
                         * adicionar estudante turma/uc
                         * alterar turma/uc estudante
                         * alterar conjunto turmas/ucs estudante */
-        int turma_;
+        string turma_;
         string uc_;
 };
 
