@@ -7,7 +7,8 @@
 int main(){
     GestaoH h;
     h.lerClasses();
-    h.lerStudentClasses();
-    h.drawEstudantes();
+    //h.lerStudentClasses();
+    //h.drawEstudantes();
+    h.drawHorario();
     return 0;
 }

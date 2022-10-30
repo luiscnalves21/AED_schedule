@@ -8,6 +8,7 @@ using namespace std;
 class Slot {
     public:
         // constructor
+        Slot(); // default constructor
         Slot(const string& weekday, double startHour, double duration, const string& type);
 
         // accessors

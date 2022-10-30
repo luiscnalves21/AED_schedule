@@ -1,5 +1,12 @@
 #include "../include/slot.h"
 
+Slot::Slot() {
+    weekday_ = "";
+    startHour_ = 0.0;
+    finalHour_ = 0.0;
+    type_ = "";
+}
+
 Slot::Slot(const string& weekday, double startHour, double duration, const string& type) {
     weekday_ = weekday;
     startHour_ = startHour;

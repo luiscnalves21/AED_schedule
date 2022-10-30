@@ -23,6 +23,7 @@ class GestaoH {
 
         // draw methods
         void drawEstudantes() const;
+        void drawHorario() const;
 
         // getters
         set<Student> getEstudantes() const;
