@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <math.h>
 
 GestaoH::GestaoH() {
     estudantes_ = set<Student> {};
@@ -86,31 +87,73 @@ void GestaoH::lerStudentClasses() {
     setEstudantes(estudantes);
 }
 
+// função auxiliar para desenhar
+pair<int, int> auxCenterDraw(int n, bool v) {
+    int pad1 = n;
+    int pad2;
+    if (v) {
+        pad2 = pad1+1;
+    }
+    else {
+        pad2 = pad1;
+    }
+    return pair<int, int> {pad1, pad2};
+}
+
+void auxHourDraw(double n) {
+    bool flag_decimal = true;
+    bool flag_two_digits = false;
+
+    if(ceil(n) == floor(n)) flag_decimal = false;
+    if (n >= 10.0) flag_two_digits = true;
+
+    if (flag_two_digits && flag_decimal) cout << "   " << n << "   |";
+    else if (flag_two_digits) cout << "    " << n << "    |";
+    else if (flag_decimal) cout << "   " << n << "    |";
+    else cout << "    " << n << "     |";
+}
+
+void auxTypeDraw(const string& type) {
+    switch (type.length()) {
+        case 1:
+            cout << "   " << type << "   |\n";
+            break;
+        case 2:
+            cout << "   " << type << "  |\n";
+            break;
+    }
+}
+
 void GestaoH::drawEstudantes() const {
     set<Student> estudantes = getEstudantes();
     cout << "+-------------+---------------------------+----------+-----------+\n"
-            "| StudentCode |        StudentName        |  UcCode  | ClassCode +\n";
+            "| StudentCode |        StudentName        |  UcCode  | ClassCode |\n";
     for (const Student& s : estudantes) {
         for (int i = 0; i < 36+getMaxLength(); i++) {
             if (i == 0 || i == 13 || i == 40 || i == 50) cout << "+";
             cout << "-";
             if (i == 35+getMaxLength()) cout << "+\n";
         }
-        int pad1 = getMaxLength()-(int)s.getName().length();
-        int pad2;
-        if ((int)s.getName().length()%2 == 1) pad2 = pad1+1;
-        else pad2 = pad1;
         cout << "|  " << s.getCode() << "  | ";
-        for (int f = 0; f < pad1; f++) {
+        pair<int, int> pad = auxCenterDraw(getMaxLength()-(int)s.getName().length(), (int)s.getName().length()%2 == 1);
+        for (int f = 0; f < pad.first; f++) {
             cout << " ";
             ++f;
         }
          cout << s.getName();
-        for (int e = 0; e < pad2; e++) {
+        for (int e = 0; e < pad.second; e++) {
             cout << " ";
             ++e;
         }
-        cout << "|\n";
+        int c = 0;
+        list<UcTurma> classUc = s.getTurmas();
+        for (const UcTurma& u : classUc) {
+            if (c > 0) {
+                cout << "|             |                           ";
+            }
+            cout << "| " << u.getUcCode() << " |  " << u.getClassCode() << "  |\n";
+            c++;
+        }
     }
     for (int i = 0; i < 36+getMaxLength(); i++) {
         if (i == 0 || i == 13 || i == 40 || i == 50) cout << "+";
@@ -121,15 +164,44 @@ void GestaoH::drawEstudantes() const {
 
 void GestaoH::drawHorario() const {
     vector<TurmaH> horario = getHorario();
-    for (const TurmaH& t : horario) {
-        list<Slot> slot = t.getHorarioUcClass();
-        cout << "ucCode: " << t.getUcCode() << " classCode: " << t.getClassCode() << " slots size: "
-        << t.getHorarioUcClass().size();
-        cout << " weekday: ";
-        for (const Slot& s : slot) {
-            cout << s.getWeekday() << " ";
+    cout << "+----------+-----------+-------------+----------+----------+-------+\n"
+            "|  UcCode  | ClassCode |   Weekday   | Start H. | Final H. |  Type |\n";
+    for (const TurmaH& s : horario) {
+        for (int i = 0; i < 61; i++) {
+            if (i == 0 || i == 10 || i == 21 || i == 34 || i == 44 || i == 54) cout << "+";
+            cout << "-";
+            if (i == 60) cout << "+\n";
         }
-        cout << endl;
+        if (s.getUcCode().length() == 5) cout << "|  " << s.getUcCode() << "   |  ";
+        else cout << "| " << s.getUcCode() << " |  ";
+        cout << s.getClassCode() << "  |  ";
+        int c = 0;
+        list<Slot> slot = s.getHorarioUcClass();
+        for (const Slot& u : slot) {
+            if (c > 0) {
+                cout << "|          |           |  ";
+            }
+            pair<int, int> pad = auxCenterDraw(9-(int)u.getWeekday().length(), (int)u.getWeekday().length()%2 == 1);
+            for (int f = 0; f < pad.first; f++) {
+                cout << " ";
+                ++f;
+            }
+            cout << u.getWeekday();
+            for (int e = 0; e < pad.second; e++) {
+                cout << " ";
+                ++e;
+            }
+            cout << " |";
+            auxHourDraw(u.getStartHour());
+            auxHourDraw(u.getFinalHour());
+            auxTypeDraw(u.getType());
+            c++;
+        }
+    }
+    for (int i = 0; i < 61; i++) {
+        if (i == 0 || i == 10 || i == 21 || i == 34 || i == 44 || i == 54) cout << "+";
+        cout << "-";
+        if (i == 60) cout << "+\n";
     }
 }
 

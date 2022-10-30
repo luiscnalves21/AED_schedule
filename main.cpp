@@ -6,9 +6,9 @@
 
 int main(){
     GestaoH h;
-    h.lerClasses();
-    //h.lerStudentClasses();
-    //h.drawEstudantes();
-    h.drawHorario();
+    h.lerClasses(); // lê o ficheiro classes.csv
+    h.drawHorario(); // desenha o vector<TurmaH>
+    //h.lerStudentClasses(); // lê o ficheiro StudentClasses.csv
+    //h.drawEstudantes(); // desenha o set<Student>
     return 0;
 }
