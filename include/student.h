@@ -15,6 +15,7 @@ class Student {
 
     public:
         // constructor
+        Student(); // default constructor
         Student(int code, const string& name, list<UcTurma>& turmas);
 
         // accessors

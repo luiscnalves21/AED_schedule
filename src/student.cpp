@@ -1,5 +1,11 @@
 #include "../include/student.h"
 
+Student::Student() {
+    code_ = 0;
+    name_ = "";
+    turmas_ = list<UcTurma> {};
+}
+
 Student::Student(int code, const string& name, list<UcTurma>& turmas) {
     code_ = code;
     name_ = name;

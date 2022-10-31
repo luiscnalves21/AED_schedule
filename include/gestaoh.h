@@ -18,18 +18,21 @@ class GestaoH {
         GestaoH(set<Student> estudantes, vector<TurmaH> horario, queue<Pedido> pedido);
 
         // methods
-        void lerClasses();
-        void lerStudentClasses();
+        void lerClasses(); // lê o ficheiro classes.csv e guarda as informações num vector<TurmaH>
+        void lerStudentClasses(); // lê o ficheiro student_classes.csv
 
         // draw methods
-        void drawEstudantes() const;
-        void drawHorario() const;
+        void drawEstudantes() const; // desenha um set de estudantes
+        void drawEstudante(const Student& estudante, bool header, bool oneStudent) const; // desenha um estudante, e caso seja true, desenha também o header e o footer
+        void drawHorario() const; // desenha um vector de turmas
+        static void drawMenu(); // desenha o menu
 
         // getters
         set<Student> getEstudantes() const;
         vector<TurmaH> getHorario() const;
-        queue<Pedido> getPedido() const;
-        int getMaxLength() const;
+        queue<Pedido> getPedido() const; // ! FALTA IMPLEMENTAR !
+        Student getSpecificStudent(int n) const; // return de um estudante específico de um set de estudantes
+        int getMaxLength() const; // return do tamanho máximo de um nome de estudante do set de estudantes
 
         // setters
         void setEstudantes(set<Student> estudantes);
@@ -38,7 +41,7 @@ class GestaoH {
         void setMaxLength(int maxLength);
 
         // other functions
-        void addPedido(Pedido pedido);
+        void addPedido(const Pedido& pedido); // ! FALTA IMPLEMENTAR !
     private:
         set<Student> estudantes_;
         vector<TurmaH> horario_;
