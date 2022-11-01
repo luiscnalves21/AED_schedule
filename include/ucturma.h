@@ -18,6 +18,7 @@ class UcTurma {
         // setters
         void setUcCode(const string& ucCode);
         void setClassCode(const string& classCode);
+        void addNumberOfStudents(); // ver para que é que serve
     private:
         string ucCode_;
         string classCode_;

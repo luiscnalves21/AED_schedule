@@ -14,11 +14,11 @@ void teclaErro() {
 // depois do utilizador escolher uma tarefa, aparece a opção de voltar ao menu
 void voltar() {
     string op;
-    cout << "Pressione [V] para voltar ao Menu:";
+    cout << "\nPressione [V] para voltar ao Menu:";
     cin >> op;
     while (op != "V" && op != "v") {
         teclaErro();
-        cout << "Pressione [V] para voltar ao Menu:";
+        cout << "\nPressione [V] para voltar ao Menu:";
         cin >> op;
     }
 }
@@ -45,15 +45,19 @@ int main() {
         else if (op == "2") {
             Student estudante;
             int n;
-            cout << "Numero UP: up";
+            cout << "\nNumero UP: up";
             cin >> n;
             estudante = h.getSpecificStudent(n);
             if (estudante.getCode() == 0) cout << "O estudante especificado nao se encontra matriculado.\n";
-            else h.drawEstudante(estudante, true, true);
+            else h.drawEstudante(estudante, true);
             voltar();
         }
         else if (op == "3") {
             h.drawHorario();
+            voltar();
+        }
+        else if (op == "4") {
+            h.drawNumberOfStudentsPerUcTurma();
             voltar();
         }
         else if (op == "q" || op == "Q") break;

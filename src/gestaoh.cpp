@@ -9,12 +9,14 @@ GestaoH::GestaoH() {
     estudantes_ = set<Student> {};
     horario_ = vector<TurmaH> {};
     pedido_ = queue<Pedido> {};
+    numberOfStudentsPerUcTurma_ = vector<pair<UcTurma, int>> {};
 }
 
-GestaoH::GestaoH(set<Student> estudantes, vector<TurmaH> horario, queue<Pedido> pedido) {
+GestaoH::GestaoH(set<Student> estudantes, vector<TurmaH> horario, queue<Pedido> pedido, vector<pair<UcTurma, int>> numberOfStudentsPerUcTurma) {
     estudantes_ = std::move(estudantes); // em vez de fazer estudantes_ = estudantes fazemos
     horario_ = std::move(horario);       // isso para não copiarmos o objeto duas vezes
     pedido_ = std::move(pedido);         // (sugestão do CLion)
+    numberOfStudentsPerUcTurma_ = std::move(numberOfStudentsPerUcTurma);
 }
 
 void GestaoH::lerClasses() {
@@ -60,7 +62,8 @@ void GestaoH::lerStudentClasses() {
     int tempSstudentCode; // para guardar o código do estudante anterior
     set<Student> estudantes; // criar set de estudantes
     list<UcTurma> listaUcTurma; // criar lista de ucTurma para cada estudante
-    UcTurma classUc; // criar UcTurma para cada conjunto de ucCode/classCode
+    UcTurma ucTurma; // criar UcTurma para cada conjunto de ucCode/classCode
+    vector<pair<UcTurma, int>> studentsPerUcTurma;
     string ficheiro = "../schedule/students_classes.csv";
     ifstream ifs;
     ifs.open(ficheiro, ios::in); // abre ficheiro
@@ -80,12 +83,32 @@ void GestaoH::lerStudentClasses() {
                 setMaxLength((int)tempStudentName.length());
             }
         }
-        classUc.setUcCode(ucCode); // insere o ucCode
-        classUc.setClassCode(classCode); // insere o classCode
-        listaUcTurma.push_back(classUc); // adiciona o conjunto ucCode/classCode à list<UcTurma>
+        UcTurma aux;
+        bool verifyUcTurma = false;
+        int indice;
+        for (int i = 0; i < studentsPerUcTurma.size(); i++) { // percorre o vetor de estudantes por turma
+            if (classCode == studentsPerUcTurma[i].first.getClassCode() && ucCode == studentsPerUcTurma[i].first.getUcCode()) { // verifica se a ucturma já está no vetor
+                verifyUcTurma = true;
+                indice = i;
+                break;
+            }
+        }
+        if (verifyUcTurma) {
+            studentsPerUcTurma[indice].second++; // se sim, adiciona mais um estudante
+        }
+        else { // se não, cria uma nova ucturma e coloca no vetor
+            aux.setUcCode(ucCode);
+            aux.setClassCode(classCode);
+            pair<UcTurma, int> numberOfStudent = {aux, 1};
+            studentsPerUcTurma.push_back(numberOfStudent);
+        }
+        ucTurma.setUcCode(ucCode); // insere o ucCode
+        ucTurma.setClassCode(classCode); // insere o classCode
+        listaUcTurma.push_back(ucTurma); // adiciona o conjunto ucCode/classCode à list<UcTurma>
         tempStudentName = studentName; // muda o nome do estudante temporário para o estudante atual
         tempSstudentCode = studentCode; // muda o número do estudante temporário para o estudante atual
     }
+    setNumberOfStudentsPerUcTurma(studentsPerUcTurma); // povoar o vetor<pair<UcTurma, int>>
     setEstudantes(estudantes); // povoar o set<Student>
 }
 
@@ -129,18 +152,14 @@ void auxTypeDraw(const string& type) {
     }
 }
 
-void GestaoH::drawEstudante(const Student& estudante, bool header, bool oneStudent) const {
+void GestaoH::drawEstudante(const Student& estudante, bool header) const {
     // desenha o cabeçalho quando é o primeiro estudante
     if (header) {
         cout << "+-------------+---------------------------+----------+-----------+\n"
-                "| StudentCode |        StudentName        |  UcCode  | ClassCode |\n";
+                "| StudentCode |        StudentName        |  UcCode  | ClassCode |\n"
+                "+-------------+---------------------------+----------+-----------+\n";
     }
     // apresenta as informações relativas a um estudante
-    for (int i = 0; i < 36+getMaxLength(); i++) {
-        if (i == 0 || i == 13 || i == 40 || i == 50) cout << "+";
-        cout << "-";
-        if (i == 35+getMaxLength()) cout << "+\n";
-    }
     cout << "|  " << estudante.getCode() << "  | ";
     pair<int, int> pad = auxCenterDraw(getMaxLength()-(int)estudante.getName().length(), (int)estudante.getName().length()%2 == 1);
     for (int f = 0; f < pad.first; f++) {
@@ -161,23 +180,6 @@ void GestaoH::drawEstudante(const Student& estudante, bool header, bool oneStude
         cout << "| " << u.getUcCode() << " |  " << u.getClassCode() << "  |\n";
         c++;
     }
-    // desenha o rodapé se for para representar apenas um estudante
-    if (oneStudent) {
-        for (int i = 0; i < 36+getMaxLength(); i++) {
-            if (i == 0 || i == 13 || i == 40 || i == 50) cout << "+";
-            cout << "-";
-            if (i == 35+getMaxLength()) cout << "+\n";
-        }
-    }
-}
-
-void GestaoH::drawEstudantes() const {
-    set<Student> estudantes = getEstudantes();
-    int v = 1;
-    for (const Student& s : estudantes) {
-        drawEstudante(s, v, false);
-        v = 0;
-    }
     // desenha o rodapé
     for (int i = 0; i < 36+getMaxLength(); i++) {
         if (i == 0 || i == 13 || i == 40 || i == 50) cout << "+";
@@ -186,16 +188,21 @@ void GestaoH::drawEstudantes() const {
     }
 }
 
+void GestaoH::drawEstudantes() const {
+    set<Student> estudantes = getEstudantes();
+    int v = 1;
+    for (const Student& s : estudantes) {
+        drawEstudante(s, v);
+        v = 0;
+    }
+}
+
 void GestaoH::drawHorario() const {
     vector<TurmaH> horario = getHorario();
     cout << "+----------+-----------+-------------+----------+----------+-------+\n"
-            "|  UcCode  | ClassCode |   Weekday   | Start H. | Final H. |  Type |\n";
+            "|  UcCode  | ClassCode |   Weekday   | Start H. | Final H. |  Type |\n"
+            "+----------+-----------+-------------+----------+----------+-------+\n";
     for (const TurmaH& s : horario) {
-        for (int i = 0; i < 61; i++) {
-            if (i == 0 || i == 10 || i == 21 || i == 34 || i == 44 || i == 54) cout << "+";
-            cout << "-";
-            if (i == 60) cout << "+\n";
-        }
         if (s.getUcCode().length() == 5) cout << "|  " << s.getUcCode() << "   |  ";
         else cout << "| " << s.getUcCode() << " |  ";
         cout << s.getClassCode() << "  |  ";
@@ -221,24 +228,40 @@ void GestaoH::drawHorario() const {
             auxTypeDraw(u.getType());
             c++;
         }
+        for (int i = 0; i < 61; i++) {
+            if (i == 0 || i == 10 || i == 21 || i == 34 || i == 44 || i == 54) cout << "+";
+            cout << "-";
+            if (i == 60) cout << "+\n";
+        }
     }
-    for (int i = 0; i < 61; i++) {
-        if (i == 0 || i == 10 || i == 21 || i == 34 || i == 44 || i == 54) cout << "+";
-        cout << "-";
-        if (i == 60) cout << "+\n";
+}
+
+void GestaoH::drawNumberOfStudentsPerUcTurma() const {
+    vector<pair<UcTurma, int>> nOS = getNumberOfStudentsPerUcTurma();
+    cout << "+----------+-----------+----------+\n"
+            "|          |           |  Number  |\n"
+            "|  UcCode  | ClassCode |    of    |\n"
+            "|          |           | Students |\n"
+            "+----------+-----------+----------+\n";
+    for (const pair<UcTurma, int>& ut : nOS) {
+        cout << "| " << ut.first.getUcCode() << " |  " << ut.first.getClassCode() << "  | ";
+        if (ut.second >= 10) cout << "   " << ut.second << "    |\n";
+        else cout << "    " << ut.second << "    |\n";
+        cout << "+----------+-----------+----------+\n";
     }
 }
 
 void GestaoH::drawMenu() {
-    cout << "+-----------------------------------------+\n"
+    cout << "\n+-----------------------------------------+\n"
             "|        GESTAO DE HORARIOS               |\n"
             "+-----------------------------------------+\n"
             "| [1] - Listar estudantes e UCs           |\n"
             "| [2] - Listar um estudante em especifico |\n"
             "| [3] - Listar Blocos de Aulas            |\n"
+            "| [4] - Numero de estudante por Uc/Turma  |\n"
             "| [Q] - Sair da aplicacao                 |\n"
             "+-----------------------------------------+\n";
-    cout << ":";
+    cout << "\nEscolha a opcao e pressione ENTER:";
 }
 
 set<Student> GestaoH::getEstudantes() const {
@@ -263,6 +286,10 @@ Student GestaoH::getSpecificStudent(int n) const {
     return {};
 }
 
+vector<pair<UcTurma, int>> GestaoH::getNumberOfStudentsPerUcTurma() const {
+    return numberOfStudentsPerUcTurma_;
+}
+
 int GestaoH::getMaxLength() const {
     return maxLength_;
 }
@@ -279,10 +306,26 @@ void GestaoH::setPedido(queue<Pedido> pedido) {
     pedido_ = std::move(pedido);
 }
 
+void GestaoH::setNumberOfStudentsPerUcTurma(vector<pair<UcTurma, int>> numberOfStudentsPerUcTurma) {
+    numberOfStudentsPerUcTurma_ = std::move(numberOfStudentsPerUcTurma);
+}
+
 void GestaoH::setMaxLength(int maxLength) {
     maxLength_ = maxLength;
 }
 
 void GestaoH::addPedido(const Pedido& pedido){
     pedido_.push(pedido);
+}
+
+void GestaoH::processarPedidos() { // !COMPLETAR
+    queue<Pedido> aux = getPedido();
+}
+
+void GestaoH::addNumberOfStudentsPerUcTurma(const UcTurma& ucTurma) {
+    for (pair<UcTurma, int>& i : numberOfStudentsPerUcTurma_) {
+        if (i.first.getUcCode() == ucTurma.getUcCode() && i.first.getClassCode() == ucTurma.getClassCode()) {
+            i.second += 1;
+        }
+    }
 }

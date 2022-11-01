@@ -15,7 +15,7 @@ class TurmaH : public UcTurma { // usa-se public UcTurma já que essa classe usa
         
         // accessors
         list<Slot> getHorarioUcClass() const;
-        
+        int getNumberOfStudents() const; // ver para que é que serve
     private:
         string ucCode_; // unidade curricular
         string classCode_; // turma
