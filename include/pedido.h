@@ -8,6 +8,7 @@ using namespace std;
 class Pedido {
     public:
         // constructor
+        Pedido(); // default constructor
         Pedido(int studentCode, const string& type, const string& initialClassCode, const string& finalClassCode_, const string& ucCode);
 
         // accessors

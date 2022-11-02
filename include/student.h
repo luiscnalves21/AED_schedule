@@ -18,10 +18,13 @@ class Student {
         Student(); // default constructor
         Student(int code, const string& name, list<UcTurma>& turmas);
 
-        // accessors
+        // getters
         string getName() const;
         int getCode() const;
         list<UcTurma> getTurmas() const;
+
+        // setters
+        void setTurmas(list<UcTurma> turmas);
     private:
         int code_;
         string name_;

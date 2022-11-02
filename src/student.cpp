@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "../include/student.h"
 
 Student::Student() {
@@ -22,4 +24,8 @@ int Student::getCode() const {
 
 list<UcTurma> Student::getTurmas() const {
     return turmas_;
+}
+
+void Student::setTurmas(list<UcTurma> turmas) {
+    turmas_ = std::move(turmas);
 }
