@@ -16,7 +16,6 @@ class Slot {
         double getStartHour() const;
         double getFinalHour() const;
         string getType() const;
-
     private:
         string weekday_;
         double startHour_;

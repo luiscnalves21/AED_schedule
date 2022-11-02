@@ -8,11 +8,11 @@
 GestaoH::GestaoH() {
     estudantes_ = set<Student> {};
     horario_ = vector<TurmaH> {};
-    pedido_ = queue<Pedido> {};
+    pedido_ = queue<vector<Pedido>> {};
     numberOfStudentsPerUcTurma_ = vector<pair<UcTurma, int>> {};
 }
 
-GestaoH::GestaoH(set<Student> estudantes, vector<TurmaH> horario, queue<Pedido> pedido, vector<pair<UcTurma, int>> numberOfStudentsPerUcTurma) {
+GestaoH::GestaoH(set<Student> estudantes, vector<TurmaH> horario, queue<vector<Pedido>> pedido, vector<pair<UcTurma, int>> numberOfStudentsPerUcTurma) {
     estudantes_ = std::move(estudantes); // em vez de fazer estudantes_ = estudantes fazemos
     horario_ = std::move(horario);       // isso para não copiarmos o objeto duas vezes
     pedido_ = std::move(pedido);         // (sugestão do CLion)
@@ -249,13 +249,27 @@ void GestaoH::drawNumberOfStudentsPerUcTurma() const {
 
 void GestaoH::drawMenu() {
     cout << "\n+-----------------------------------------+\n"
-            "|        GESTAO DE HORARIOS               |\n"
+            "|           GESTAO DE HORARIOS            |\n"
             "+-----------------------------------------+\n"
             "| [1] - Listar estudantes e UCs           |\n"
             "| [2] - Listar um estudante em especifico |\n"
             "| [3] - Listar Blocos de Aulas            |\n"
             "| [4] - Numero de estudantes por Uc/Turma |\n"
+            "| [5] - Alteracao de turmas               |\n"
             "| [Q] - Sair da aplicacao                 |\n"
+            "+-----------------------------------------+\n";
+    cout << "\nEscolha a opcao e pressione ENTER:";
+}
+
+void GestaoH::drawPedido() {
+    cout << "\n+-----------------------------------------+\n"
+            "|               FAZER PEDIDO              |\n"
+            "+-----------------------------------------+\n"
+            "| [A] - Adicionar Turma                   |\n"
+            "| [R] - Remover Turma                     |\n"
+            "| [T] - Troca de Turma                    |\n"
+            "| [C] - Conjunto de Trocas                |\n"
+            "| [V] - Voltar ao Menu principal          |\n"
             "+-----------------------------------------+\n";
     cout << "\nEscolha a opcao e pressione ENTER:";
 }
@@ -268,7 +282,7 @@ vector<TurmaH> GestaoH::getHorario() const {
     return horario_;
 }
 
-queue<Pedido> GestaoH::getPedido() const {
+queue<vector<Pedido>> GestaoH::getPedido() const {
     return pedido_;
 }
 
@@ -298,7 +312,7 @@ void GestaoH::setHorario(vector<TurmaH> horario) {
     horario_ = std::move(horario);
 }
 
-void GestaoH::setPedido(queue<Pedido> pedido) {
+void GestaoH::setPedido(queue<vector<Pedido>> pedido) {
     pedido_ = std::move(pedido);
 }
 
@@ -310,31 +324,80 @@ void GestaoH::setMaxLength(int maxLength) {
     maxLength_ = maxLength;
 }
 
-void GestaoH::addPedido(const Pedido& pedido){
+void GestaoH::addPedido(const vector<Pedido>& pedido){
     pedido_.push(pedido);
 }
 
-void GestaoH::processarPedidos() { // !COMPLETAR
-    Pedido pedido;
+void GestaoH::processarPedidos(){
+    vector<Pedido> pedido;
     UcTurma novaUcTurma;
     Student newStudent;
     list<UcTurma> turmas;
+    list<Slot> horarioUc;
+    Slot novaAula;
     int CAP = 26; // capacidade máxima de uma turma (pode ser alterado)
     while(!pedido_.empty()){ // enquanto a queue não estiver vazia
         pedido = pedido_.front(); // buscar o primeiro elemento da queue
-        if(pedido.getType() == "A"){ // adicionar a uma turma
-            for(auto& i: estudantes_){ // percorre o set estudantes
-                if(pedido.getStudentCode() == i.getCode()){ // verifica o código de estudante com o do pedido
-                    for(auto &s: numberOfStudentsPerUcTurma_){ // percorre o vetor numberOfStudentsPerUcTurma_
-                        if(s.first.getUcCode() == pedido.getUcCode() && s.first.getClassCode() == pedido.getFinalClassCode()){ // verifica se é a turma e unidade curricular correta
-                            if(s.second < CAP){ // verifica se o número de estudantes na ucturma não está no limite, para se poder por mais 1 aluno
-                                newStudent = i; // foi necessário remover o estudante do set
-                                estudantes_.erase(i); // para se poder inserir um novo
-                                turmas = i.getTurmas(); // uma vez que não é possível alterar os valores já no set
-                                s.second++;
-                                novaUcTurma.setClassCode(pedido.getFinalClassCode());
-                                novaUcTurma.setUcCode(pedido.getUcCode());
-                                turmas.push_back(novaUcTurma);
+        unsigned n = 0;
+        for(auto& index : horario_){ // vai buscar ao vetor dos horários o slot da aula TP ou PL que a turma para que quer mudar vai ocupar
+            if(index.getUcCode() == pedido[n].getUcCode() && index.getClassCode() == pedido[n].getFinalClassCode()){
+                for(const auto& e: index.getHorarioUcClass()){
+                    if(e.getType() == "TP" || e.getType() == "PL"){
+                        novaAula = e;
+                    }
+                }
+            }
+        }
+        while(n < pedido.size()){
+            if(pedido[n].getType() == "A"){ // adicionar a uma turma
+                for(auto& i: estudantes_){ // percorre o set estudantes
+                    if(pedido[n].getStudentCode() == i.getCode()){ // verifica o código de estudante com o do pedido
+                        for(auto &s: numberOfStudentsPerUcTurma_){ // percorre o vetor numberOfStudentsPerUcTurma_
+                            if(s.first.getUcCode() == pedido[n].getUcCode() && s.first.getClassCode() == pedido[n].getFinalClassCode()){ // verifica se é a turma e unidade curricular correta
+                                if(s.second < CAP){ // verifica se o número de estudantes na ucturma não está no limite, para se poder por mais 1 aluno
+                                    for(const auto& ucturma: i.getTurmas()){ // percorre a lista de ucturmas de um estudante
+                                        for(auto& cadeira: horario_){ // percorre as cadeiras no vetor dos horários
+                                            if((ucturma.getUcCode() == cadeira.getUcCode() && ucturma.getClassCode() == cadeira.getClassCode()) && (ucturma.getUcCode() != pedido[n].getUcCode())){ // verifica se é a mesma cadeira e turma e se o estudante já está inscrito na cadeira
+                                                for(auto& aula: cadeira.getHorarioUcClass()){ // percorre a lista de horários de uma ucturma específica
+                                                    if(aula.getType() == "TP" || aula.getType() == "PL"){ // verifica se é a aula teórico-prática ou prática laboratorial
+                                                        if(aula.getWeekday() == novaAula.getWeekday()){ // verifica se é no mesmo dia da semana
+                                                            if(aula.getStartHour() > novaAula.getFinalHour() || aula.getFinalHour() < novaAula.getStartHour()){ // verifica se a aula de uma cadeira existente não se sobrepõe à nova
+                                                                newStudent = i; // foi necessário remover o estudante do set
+                                                                estudantes_.erase(i); // para se poder inserir um novo
+                                                                turmas = i.getTurmas(); // uma vez que não é possível alterar os valores já no set
+                                                                s.second++;
+                                                                novaUcTurma.setClassCode(pedido[n].getFinalClassCode());
+                                                                novaUcTurma.setUcCode(pedido[n].getUcCode());
+                                                                turmas.push_back(novaUcTurma);
+                                                                newStudent.setTurmas(turmas);
+                                                                estudantes_.insert(newStudent);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if(pedido[n].getType() == "R"){ // remover de uma turma
+                for(auto& i: estudantes_){
+                    if(pedido[n].getStudentCode() == i.getCode()){
+                        for(auto &s: numberOfStudentsPerUcTurma_){
+                            if(s.first.getUcCode() == pedido[n].getUcCode() && s.first.getClassCode() == pedido[n].getInitialClassCode()){ // aqui não será necessário verificar o número de estudantes
+                                newStudent = i; // de uma turma, visto que nunca poderá passar do limite e não existe limite mínimo
+                                estudantes_.erase(i);
+                                turmas = i.getTurmas();
+                                s.second--;
+                                for(auto itr = turmas.begin(); itr != turmas.end(); itr++){ // percorre a lista de ucturmas de um estudante
+                                    if(itr->getUcCode() == pedido[n].getUcCode() && itr->getClassCode() == pedido[n].getInitialClassCode()){ // verificação da ucturma
+                                        turmas.erase(itr); // remoção da ucturma da lista do estudante
+                                    }
+                                }
                                 newStudent.setTurmas(turmas);
                                 estudantes_.insert(newStudent);
                             }
@@ -342,55 +405,48 @@ void GestaoH::processarPedidos() { // !COMPLETAR
                     }
                 }
             }
-        }
-        if(pedido.getType() == "R"){ // remover de uma turma
-            for(auto& i: estudantes_){
-                if(pedido.getStudentCode() == i.getCode()){
-                    for(auto &s: numberOfStudentsPerUcTurma_){
-                        if(s.first.getUcCode() == pedido.getUcCode() && s.first.getClassCode() == pedido.getInitialClassCode()){ // aqui não será necessário verificar o número de estudantes
-                            newStudent = i; // de uma turma, visto que nunca poderá passar do limite e não existe limite mínimo
-                            estudantes_.erase(i);
-                            turmas = i.getTurmas();
-                            s.second--;
-                            for(auto itr = turmas.begin(); itr != turmas.end(); itr++){ // percorre a lista de ucturmas de um estudante
-                                if(itr->getUcCode() == pedido.getUcCode() && itr->getClassCode() == pedido.getInitialClassCode()){ // verificação da ucturma
-                                    turmas.erase(itr); // remoção da ucturma da lista do estudante
-                                }
-                            }
-                            newStudent.setTurmas(turmas);
-                            estudantes_.insert(newStudent);
-                        }
-                    }
-                }
-            }
-        }
-        if(pedido.getType() == "T"){ // troca de turma
-            for(auto& i: estudantes_){
-                if(pedido.getStudentCode() == i.getCode()){
-                    for(auto &s: numberOfStudentsPerUcTurma_){ // preciso de percorrer o vetor 2 vezes
-                        for(auto &d: numberOfStudentsPerUcTurma_){ // uma vez que preciso da turma que o estudante está e aquela para a qual ele quer mudar
-                            if(s.first.getUcCode() == pedido.getUcCode() && d.first.getUcCode() == pedido.getUcCode() && s.first.getClassCode() == pedido.getInitialClassCode() && d.first.getClassCode() == pedido.getFinalClassCode()){ // verifica se s é a turma inicial e d a turma final
-                                if(abs((s.second-1) - (d.second+1)) < 4){ // verifica se a diferença entre o número de estudantes depois da mudança é menor que 4
-                                    s.second--;
-                                    d.second++;
-                                    newStudent = i;
-                                    estudantes_.erase(i);
-                                    turmas = i.getTurmas();
-                                    for(auto& turma : turmas){ // percorre a lista de ucturmas do estudante
-                                        if(turma.getUcCode() == pedido.getUcCode() && turma.getClassCode() == pedido.getInitialClassCode()){ // verifica se é a ucturma correta
-                                            turma.setClassCode(pedido.getFinalClassCode()); // troca na lista o código da turma
+            if(pedido[n].getType() == "T" || pedido[n].getType() == "CT"){ // troca de turma
+                for(auto& i: estudantes_){
+                    if(pedido[n].getStudentCode() == i.getCode()){
+                        for(auto &s: numberOfStudentsPerUcTurma_){ // preciso de percorrer o vetor 2 vezes
+                            for(auto &d: numberOfStudentsPerUcTurma_){ // uma vez que preciso da turma que o estudante está e aquela para a qual ele quer mudar
+                                if(s.first.getUcCode() == pedido[n].getUcCode() && d.first.getUcCode() == pedido[n].getUcCode() && s.first.getClassCode() == pedido[n].getInitialClassCode() && d.first.getClassCode() == pedido[n].getFinalClassCode()){ // verifica se s é a turma inicial e d a turma final
+                                    if((abs((s.second-1) - (d.second+1)) < 4) && (s.second < CAP || d.second < CAP)){ // verifica se a diferença entre o número de estudantes depois da mudança é menor que 4 e se ambos estão abaixo do limite máximo
+                                        for(const auto& ucturma: i.getTurmas()) { // percorre a lista de ucturmas de um estudante
+                                            for(auto &cadeira: horario_) { // percorre as cadeiras no vetor dos horários
+                                                if((ucturma.getUcCode() == cadeira.getUcCode() && ucturma.getClassCode() == cadeira.getClassCode()) && (ucturma.getUcCode() != pedido[n].getUcCode())) { // verifica se é a mesma cadeira e turma e se difere da cadeira que pretendemos mudar
+                                                    for(auto &aula: cadeira.getHorarioUcClass()) { // percorre a lista de horários de uma ucturma específica
+                                                        if(aula.getType() == "TP" || aula.getType() == "PL") { // verifica se é a aula teórico-prática ou prática laboratorial
+                                                            if(aula.getWeekday() == novaAula.getWeekday()) { // verifica se é no mesmo dia da semana
+                                                                if(aula.getStartHour() > novaAula.getFinalHour() || aula.getFinalHour() < novaAula.getStartHour()) { // verifico se existe sobreposição de aulas
+                                                                    s.second--;
+                                                                    d.second++;
+                                                                    newStudent = i;
+                                                                    estudantes_.erase(i);
+                                                                    turmas = i.getTurmas();
+                                                                    for(auto &turma: turmas) { // percorre a lista de ucturmas do estudante
+                                                                        if(turma.getUcCode() == pedido[n].getUcCode() && turma.getClassCode() == pedido[n].getInitialClassCode()) { // verifica se é a ucturma correta
+                                                                            turma.setClassCode(pedido[n].getFinalClassCode()); // troca na lista o código da turma
+                                                                        }
+                                                                    }
+                                                                    newStudent.setTurmas(turmas);
+                                                                    estudantes_.insert(newStudent);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
-                                    newStudent.setTurmas(turmas);
-                                    estudantes_.insert(newStudent);
                                 }
                             }
                         }
                     }
                 }
             }
+            n++;
         }
-//      if(pedido.getType() == "CT") -> conjunto de trocas (!Como vamos fazer isto?)
         pedido_.pop(); // remove o primeiro elemento da queue
     }
 }

@@ -11,6 +11,7 @@ using namespace std;
 class TurmaH : public UcTurma { // usa-se public UcTurma já que essa classe usa dois dos atributos desta
     public:
         // constructor
+        TurmaH(); // default constructor
         TurmaH(const string& ucCode, const string& classCode, list<Slot> horarioUcClass);
         
         // accessors

@@ -11,12 +11,19 @@ class Pedido {
         Pedido(); // default constructor
         Pedido(int studentCode, const string& type, const string& initialClassCode, const string& finalClassCode_, const string& ucCode);
 
-        // accessors
+        // getters
         int getStudentCode() const;
         string getType() const;
         string getInitialClassCode() const;
         string getFinalClassCode() const;
         string getUcCode() const;
+
+        // setters
+        void setStudentCode(int studentCode);
+        void setType(string type);
+        void setInitialClassCode(string initialClassCode);
+        void setfinalClassCode(string finalClassCode);
+        void setUcCode(string ucCode);
     private:
         int studentCode_;
         string type_;   /* remover estudante turma/uc

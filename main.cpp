@@ -40,7 +40,6 @@ int main() {
         // dependendo do input do utilizador, vai executar tarefas diferentes
         if (op == "1") {
             h.drawEstudantes();
-            voltar();
         }
         else if (op == "2") {
             Student estudante;
@@ -50,15 +49,81 @@ int main() {
             estudante = h.getSpecificStudent(n);
             if (estudante.getCode() == 0) cout << "O estudante especificado nao se encontra matriculado.\n";
             else h.drawEstudante(estudante, true);
-            voltar();
         }
         else if (op == "3") {
             h.drawHorario();
-            voltar();
         }
         else if (op == "4") {
             h.drawNumberOfStudentsPerUcTurma();
-            voltar();
+        }
+        else if (op == "5"){ // operação para adicionar pedido
+            vector<Pedido> pedido;
+            queue<vector<Pedido>> pedido_;
+            int n;
+            string uc, initialClass, type, finalClass;
+            while (true) {
+                h.drawPedido();
+                string p, press;
+                cin >> p;
+                if (p == "A" || p == "a") {
+                    cout << "\nIndique o numero do estudante: "; cin >> n;
+                    cout << "\nIndique a unidade curricular: "; cin >> uc;
+                    cout << "\nIndique a turma que pretende ficar: "; cin >> finalClass;
+                    type = "A";
+                    //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
+                    Pedido aux = Pedido(n, type, initialClass, finalClass, uc);
+                    pedido.push_back(aux);
+                    pedido_.push(pedido);
+                }
+                else if (p == "R" || p == "r") {
+                    cout << "\nIndique o numero do estudante: "; cin >> n;
+                    cout << "\nIndique a unidade curricular: "; cin >> uc;
+                    cout << "\nIndique a turma que pretende remover: "; cin >> initialClass;
+                    type = "R";
+                    //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
+                    Pedido aux = Pedido(n, type, initialClass, finalClass, uc);
+                    pedido.push_back(aux);
+                    pedido_.push(pedido);
+                }
+                else if (p == "T" || p == "t") {
+                    cout << "\nIndique o numero do estudante: "; cin >> n;
+                    cout << "\nIndique a unidade curricular: "; cin >> uc;
+                    cout << "\nIndique a turma em que esta de momento: "; cin >> initialClass;
+                    cout << "\nIndique a turma para onde pretende mudar: "; cin >> finalClass;
+                    type = "T";
+                    //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
+                    Pedido aux = Pedido(n, type, initialClass, finalClass, uc);
+                    pedido.push_back(aux);
+                    pedido_.push(pedido);
+                }
+                else if (p == "C" || p == "c") {
+                    cout << "\nIndique o numero do estudante: "; cin >> n;
+                    cout << "\nIndique a unidade curricular: "; cin >> uc;
+                    type = "CT";
+                    while (true) {
+                        cout << "\nIndique a turma em que esta de momento: "; cin >> initialClass;
+                        cout << "\nIndique a turma para onde pretende mudar: "; cin >> finalClass;
+                        //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
+                        Pedido aux = Pedido(n, type, initialClass, finalClass, uc);
+                        pedido.push_back(aux);
+                        cout << "\nPressione S para sair, C para outro pedido";
+                        cin >> press;
+                        if (press == "S" || press == "s") {
+                            break;
+                        }
+                    }
+                    pedido_.push(pedido);
+                }
+                else if (p == "V" || p == "v") {
+                    break;
+                }
+                else {
+                    teclaErro();
+                    continue;
+                }
+                h.setPedido(pedido_);
+                voltar(); // só tenho que fazer voltar e quebra o loop?
+            }
         }
         else if (op == "q" || op == "Q") break;
         else teclaErro();
