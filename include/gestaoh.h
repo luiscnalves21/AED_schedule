@@ -22,7 +22,7 @@ class GestaoH {
         void lerStudentClasses(); // lê o ficheiro student_classes.csv
 
         // draw methods
-        void drawEstudantes() const; // desenha um set de estudantes
+        void drawEstudantes(set<Student> estudantes) const; // desenha um set de estudantes
         void drawEstudante(const Student& estudante, bool header) const; // desenha um estudante, e caso seja true, desenha também o header
         void drawHorario() const; // desenha um vector de turmas
         void drawNumberOfStudentsPerUcTurma() const; // desenha o numero de estudantes por uc/turma
@@ -48,6 +48,9 @@ class GestaoH {
         void addPedido(const vector<Pedido>& pedido); // ! FALTA IMPLEMENTAR !
         void processarPedidos();
         void addNumberOfStudentsPerUcTurma(const UcTurma& ucTurma);
+        set<Student> studentsPerYear();
+        set<Student> studentsPerUc();
+        set<Student> studentsPerUcPerClass();
     private:
         set<Student> estudantes_;
         vector<TurmaH> horario_;

@@ -3,25 +3,7 @@
 #include "./include/turmah.h"
 #include "./include/pedido.h"
 #include "./include/gestaoh.h"
-
-// caso o input do utilizador não esteja entre os aceitados, apresenta uma mensagem de erro
-void teclaErro() {
-    cout << "\n+--------------+\n"
-            "|Input Invalido|\n"
-            "+--------------+\n\n";
-}
-
-// depois do utilizador escolher uma tarefa, aparece a opção de voltar ao menu
-void voltar() {
-    string op;
-    cout << "\nPressione [V] para voltar ao Menu:";
-    cin >> op;
-    while (op != "V" && op != "v") {
-        teclaErro();
-        cout << "\nPressione [V] para voltar ao Menu:";
-        cin >> op;
-    }
-}
+#include "./include/menu.h"
 
 // programa principal
 int main() {
@@ -34,14 +16,34 @@ int main() {
         string op;
         cin >> op;
         if (op.length() != 1) {
-            teclaErro();
+            Menu::teclaErro();
             continue;
         }
         // dependendo do input do utilizador, vai executar tarefas diferentes
         if (op == "1") {
-            h.drawEstudantes();
+            h.drawEstudantes({});
+            Menu::voltar();
         }
         else if (op == "2") {
+            h.drawHorario();
+            Menu::voltar();
+        }
+        else if (op == "3") {
+            h.drawNumberOfStudentsPerUcTurma();
+            Menu::voltar();
+        }
+        else if (op == "4") {
+            h.drawEstudantes(h.studentsPerYear());
+            Menu::voltar();
+        }
+        else if (op == "5") {
+            h.drawEstudantes(h.studentsPerUcPerClass());
+            Menu::voltar();
+        }
+        else if (op == "6") {
+
+        }
+        else if (op == "7") {
             Student estudante;
             int n;
             cout << "\nNumero UP: up";
@@ -49,20 +51,15 @@ int main() {
             estudante = h.getSpecificStudent(n);
             if (estudante.getCode() == 0) cout << "O estudante especificado nao se encontra matriculado.\n";
             else h.drawEstudante(estudante, true);
+            Menu::voltar();
         }
-        else if (op == "3") {
-            h.drawHorario();
-        }
-        else if (op == "4") {
-            h.drawNumberOfStudentsPerUcTurma();
-        }
-        else if (op == "5"){ // operação para adicionar pedido
+        else if (op == "8"){ // operação para adicionar pedido
             vector<Pedido> pedido;
             queue<vector<Pedido>> pedido_;
             int n;
             string uc, initialClass, type, finalClass;
             while (true) {
-                h.drawPedido();
+                GestaoH::drawPedido();
                 string p, press;
                 cin >> p;
                 if (p == "A" || p == "a") {
@@ -118,15 +115,14 @@ int main() {
                     break;
                 }
                 else {
-                    teclaErro();
+                    Menu::teclaErro();
                     continue;
                 }
                 h.setPedido(pedido_);
-                voltar(); // só tenho que fazer voltar e quebra o loop?
             }
         }
         else if (op == "q" || op == "Q") break;
-        else teclaErro();
+        else Menu::teclaErro();
     }
     return 0;
 }

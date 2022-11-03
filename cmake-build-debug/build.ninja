@@ -98,6 +98,13 @@ build CMakeFiles/Projeto_AED.dir/src/slot.cpp.obj: CXX_COMPILER__Projeto_AED_Deb
   OBJECT_DIR = CMakeFiles\Projeto_AED.dir
   OBJECT_FILE_DIR = CMakeFiles\Projeto_AED.dir\src
 
+build CMakeFiles/Projeto_AED.dir/src/menu.cpp.obj: CXX_COMPILER__Projeto_AED_Debug C$:/githubProjects/projeto_aed/src/menu.cpp || cmake_object_order_depends_target_Projeto_AED
+  DEP_FILE = CMakeFiles\Projeto_AED.dir\src\menu.cpp.obj.d
+  FLAGS = -g -std=gnu++14
+  INCLUDES = -IC:/githubProjects/projeto_aed/.
+  OBJECT_DIR = CMakeFiles\Projeto_AED.dir
+  OBJECT_FILE_DIR = CMakeFiles\Projeto_AED.dir\src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Projeto_AED
@@ -106,7 +113,7 @@ build CMakeFiles/Projeto_AED.dir/src/slot.cpp.obj: CXX_COMPILER__Projeto_AED_Deb
 #############################################
 # Link the executable Projeto_AED.exe
 
-build Projeto_AED.exe: CXX_EXECUTABLE_LINKER__Projeto_AED_Debug CMakeFiles/Projeto_AED.dir/main.cpp.obj CMakeFiles/Projeto_AED.dir/src/gestaoh.cpp.obj CMakeFiles/Projeto_AED.dir/src/pedido.cpp.obj CMakeFiles/Projeto_AED.dir/src/student.cpp.obj CMakeFiles/Projeto_AED.dir/src/ucturma.cpp.obj CMakeFiles/Projeto_AED.dir/src/turmah.cpp.obj CMakeFiles/Projeto_AED.dir/src/slot.cpp.obj
+build Projeto_AED.exe: CXX_EXECUTABLE_LINKER__Projeto_AED_Debug CMakeFiles/Projeto_AED.dir/main.cpp.obj CMakeFiles/Projeto_AED.dir/src/gestaoh.cpp.obj CMakeFiles/Projeto_AED.dir/src/pedido.cpp.obj CMakeFiles/Projeto_AED.dir/src/student.cpp.obj CMakeFiles/Projeto_AED.dir/src/ucturma.cpp.obj CMakeFiles/Projeto_AED.dir/src/turmah.cpp.obj CMakeFiles/Projeto_AED.dir/src/slot.cpp.obj CMakeFiles/Projeto_AED.dir/src/menu.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Projeto_AED.dir

@@ -1,9 +1,11 @@
 #include "../include/gestaoh.h"
+#include "../include/menu.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <utility>
 #include <cmath>
+#include <algorithm>
 
 GestaoH::GestaoH() {
     estudantes_ = set<Student> {};
@@ -151,7 +153,7 @@ void auxTypeDraw(const string& type) {
 void GestaoH::drawEstudante(const Student& estudante, bool header) const {
     // desenha o cabeçalho quando é o primeiro estudante
     if (header) {
-        cout << "+-------------+---------------------------+----------+-----------+\n"
+        cout << "\n+-------------+---------------------------+----------+-----------+\n"
                 "| StudentCode |        StudentName        |  UcCode  | ClassCode |\n"
                 "+-------------+---------------------------+----------+-----------+\n";
     }
@@ -184,8 +186,10 @@ void GestaoH::drawEstudante(const Student& estudante, bool header) const {
     }
 }
 
-void GestaoH::drawEstudantes() const {
-    set<Student> estudantes = getEstudantes();
+void GestaoH::drawEstudantes(set<Student> estudantes) const {
+    if (estudantes.empty()) {
+        estudantes = getEstudantes();
+    }
     int v = 1;
     for (const Student& s : estudantes) {
         drawEstudante(s, v);
@@ -195,7 +199,7 @@ void GestaoH::drawEstudantes() const {
 
 void GestaoH::drawHorario() const {
     vector<TurmaH> horario = getHorario();
-    cout << "+----------+-----------+-------------+----------+----------+-------+\n"
+    cout << "\n+----------+-----------+-------------+----------+----------+-------+\n"
             "|  UcCode  | ClassCode |   Weekday   | Start H. | Final H. |  Type |\n"
             "+----------+-----------+-------------+----------+----------+-------+\n";
     for (const TurmaH& s : horario) {
@@ -234,7 +238,7 @@ void GestaoH::drawHorario() const {
 
 void GestaoH::drawNumberOfStudentsPerUcTurma() const {
     vector<pair<UcTurma, int>> nOS = getNumberOfStudentsPerUcTurma();
-    cout << "+----------+-----------+----------+\n"
+    cout << "\n+----------+-----------+----------+\n"
             "|          |           |  Number  |\n"
             "|  UcCode  | ClassCode |    of    |\n"
             "|          |           | Students |\n"
@@ -252,10 +256,13 @@ void GestaoH::drawMenu() {
             "|           GESTAO DE HORARIOS            |\n"
             "+-----------------------------------------+\n"
             "| [1] - Listar estudantes e UCs           |\n"
-            "| [2] - Listar um estudante em especifico |\n"
-            "| [3] - Listar Blocos de Aulas            |\n"
-            "| [4] - Numero de estudantes por Uc/Turma |\n"
-            "| [5] - Alteracao de turmas               |\n"
+            "| [2] - Listar Blocos de Aulas            |\n"
+            "| [3] - Numero de estudantes por Uc/Turma |\n"
+            "| [4] - Listar estudantes no ano X        |\n"
+            "| [5] - Listar estudantes na turma X      |\n"
+            "| [6] - Listar estudantes na UC X         |\n"
+            "| [7] - Listar um estudante em especifico |\n"
+            "| [8] - Alteracao de turmas               |\n"
             "| [Q] - Sair da aplicacao                 |\n"
             "+-----------------------------------------+\n";
     cout << "\nEscolha a opcao e pressione ENTER:";
@@ -457,4 +464,69 @@ void GestaoH::addNumberOfStudentsPerUcTurma(const UcTurma& ucTurma) {
             i.second += 1;
         }
     }
+}
+
+set<Student> GestaoH::studentsPerYear() {
+    set<Student> aux;
+    string n = "0";
+    while (true) {
+        cout << "\nIndique o ano (1, 2, 3):";
+        cin >> n;
+        if (n >= "1" && n <= "3") break;
+        Menu::teclaErro();
+    }
+    for (const Student& student : estudantes_) {
+        for (UcTurma& ucturma : student.getTurmas()) {
+            if (n[0] == ucturma.getClassCode()[0]) {
+                aux.insert(student);
+                break;
+            }
+        }
+    }
+    return aux;
+}
+
+set<Student> GestaoH::studentsPerUc() {
+    set<Student> aux; string n;
+    cout << "\nIndique a unidade curricular: ";
+    cin >> n;
+    //é preciso algo que verifique se está bem escrito (string find?)
+    for (auto& student: estudantes_) {
+        for (auto &ucturma: student.getTurmas()) {
+            if (ucturma.getUcCode() == n) {
+                aux.insert(student);
+            }
+        }
+    }
+    return aux;
+}
+
+set<Student> GestaoH::studentsPerUcPerClass() {
+    set<Student> aux;
+    string uc = "a", cl_ano = "0", cl_nr;
+    while (true) {
+        cout << "\nIndique o numero da unidade curricular: ";
+        cin >> uc;
+        if (all_of(uc.begin(), uc.end(), ::isdigit)) break;
+    }
+    cout << "\nIndique o ano e o numero da turma.";
+    while (true) {
+        cout << "\nAno:";
+        cin >> cl_ano;
+        if (cl_ano >= "1" && cl_ano <= "3") break;
+        Menu::teclaErro();
+    }
+    while (true) {
+        cout << "\nNr:";
+        cin >> cl_nr;
+        if (all_of(cl_nr.begin(), cl_nr.end(), ::isdigit)) break;
+    }
+    for (const Student& student: estudantes_) {
+        for (UcTurma& ucturma: student.getTurmas()) {
+            if (stoi(uc) == stoi(ucturma.getUcCode().substr(ucturma.getUcCode().size()-3, 3)) && stoi(cl_ano) == stoi(ucturma.getClassCode().substr(0, 1)) && stoi(cl_nr) == stoi(ucturma.getClassCode().substr(ucturma.getUcCode().size()-3, 3))) {
+                aux.insert(student);
+            }
+        }
+    }
+    return aux;
 }

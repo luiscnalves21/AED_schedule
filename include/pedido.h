@@ -26,10 +26,7 @@ class Pedido {
         void setUcCode(string ucCode);
     private:
         int studentCode_;
-        string type_;   /* remover estudante turma/uc
-                        * adicionar estudante turma/uc
-                        * alterar turma/uc estudante
-                        * alterar conjunto turmas/ucs estudante */
+        string type_;
         string initialClassCode_;
         string finalClassCode_;
         string ucCode_;
