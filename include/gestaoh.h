@@ -22,18 +22,20 @@ class GestaoH {
         void lerStudentClasses(); // lê o ficheiro student_classes.csv
 
         // draw methods
-        void drawEstudantes(set<Student> estudantes) const; // desenha um set de estudantes
-        void drawEstudante(const Student& estudante, bool header) const; // desenha um estudante, e caso seja true, desenha também o header
+        void drawEstudantes(set<Student> estudantes, bool simple) const; // desenha um set de estudantes
+        void drawEstudante(const Student& estudante, bool header, bool simple) const; // desenha um estudante, e caso seja true, desenha também o header
         void drawHorario() const; // desenha um vector de turmas
+        void drawHorarioEstudante(const Student& estudante) const; // desenha o horário de um estudante
         void drawNumberOfStudentsPerUcTurma() const; // desenha o numero de estudantes por uc/turma
         static void drawPedido(); // desenha o pedido
         static void drawMenu(); // desenha o menu
+        static bool mostrarSpecs(); // pergunta se quer mostar as specs dos estudantes
 
         // getters
         set<Student> getEstudantes() const;
         vector<TurmaH> getHorario() const;
         queue<vector<Pedido>> getPedido() const; // ! FALTA IMPLEMENTAR !
-        Student getSpecificStudent(int n) const; // return de um estudante específico de um set de estudantes
+        Student getSpecificStudent() const; // return de um estudante específico de um set de estudantes
         vector<pair<UcTurma, int>> getNumberOfStudentsPerUcTurma() const;
         int getMaxLength() const; // return do tamanho máximo de um nome de estudante do set de estudantes
 
