@@ -359,86 +359,193 @@ void inserir(int n1, vector<string>& tab1, vector<string>& tab2, vector<string>&
 }
 
 void GestaoH::drawHorarioEstudante(const Student& estudante) const {
-    cout << "\n+-----------+----------+----------+----------+----------+----------+\n"
-            "|   Horas   | Segunda  |   Terca  |  Quarta  |  Quinta  |   Sexta  |\n"
-            "+-----------+----------+----------+----------+----------+----------+\n";
     list<UcTurma> turmasEstudante = estudante.getTurmas(); // turmas do estudante
     vector<TurmaH> turmasGerais = horario_; // todas as turmas
-    sort(turmasGerais.begin(), turmasGerais.end());
-    vector<list<Slot>> horarioEstudante;
+    sort(turmasGerais.begin(), turmasGerais.end()); // ordenar turmas gerais
+    vector<pair<Slot, UcTurma>> verifySobr;
+    vector<pair<Slot, UcTurma>> sobr; // vector com as slots Ts sobrepostas
     int h1 = 8, h2 = 8;
     string zero = ":00", trinta = ":30", hifen = "-", hifens10 = "----------", hifens11 = "-----------", mais = "+";
     bool v, dBlocos, tBlocos, qBlocos;
     int n;
+    bool verTP = false, verT = false; // verificar se há sobreposição
+    string frase;
     vector<string> tab1(48, hifens10), tab2(48, hifens10), tab3(48, hifens10), tab4(48, hifens10), tab5(48, hifens10);
-    for (int i = 0; i < 24; i++) {
-        h2 += i % 2;
-        v = i%2;
-        for (const UcTurma& turma : turmasEstudante) {
-            TurmaH tempTurma(turma.getUcCode(), turma.getClassCode(), {});
-            n = binarySearch(turmasGerais, tempTurma); // return do indice da ucturma
-            tempTurma = turmasGerais[n];
-            vector<Slot> verifySobr;
-            vector<string> sobr;
-            for (const Slot& s : tempTurma.getHorarioUcClass()) {
-                for (const Slot& sl : verifySobr) {
-                    if (s.getStartHour() >= sl.getStartHour() && s.getStartHour() < sl.getFinalHour() && s.getWeekday() == sl.getWeekday()) {
-                        if (s.getType() == "T" && (sl.getType() == "TP" || sl.getType() == "PL")) {
-                            sobr.emplace_back("Sobreposicao de aulas T com " + sl.getType());
-                        }
-
+    for (const UcTurma& turma : turmasEstudante) {
+        TurmaH tempTurma(turma.getUcCode(), turma.getClassCode(), {});
+        n = binarySearch(turmasGerais, tempTurma); // return do indice da ucturma
+        tempTurma = turmasGerais[n];
+        for (const Slot &s: tempTurma.getHorarioUcClass()) {
+            pair<Slot, UcTurma> aux;
+            for (const pair<Slot, UcTurma> &sl: verifySobr) {
+                if ((s.getStartHour() >= sl.first.getStartHour() && s.getStartHour() < sl.first.getFinalHour() && s.getWeekday() == sl.first.getWeekday()) || (s.getFinalHour() > sl.first.getStartHour() && s.getFinalHour() <= sl.first.getFinalHour() && s.getWeekday() == sl.first.getWeekday())) {
+                    if ((s.getType() == "TP" || s.getType() == "PL") && (sl.first.getType() == "TP" || sl.first.getType() == "PL")) {
+                        verTP = true;
+                        break;
+                    }
+                    else if (s.getType() == "T" && (sl.first.getType() == "TP" || sl.first.getType() == "PL")) {
+                        aux.first = s;
+                        aux.second = UcTurma(turma.getUcCode(), turma.getClassCode());
+                        sobr.push_back(aux);
+                        verT = true;
+                        frase = "\n! AVISO ! -> Existe sobreposicao de aulas T com aulas TP ou PL, e por isso as aulas T nao estao representadas.\n";
+                    }
+                    else {
+                        aux.first = s;
+                        aux.second = UcTurma(turma.getUcCode(), turma.getClassCode());
+                        sobr.push_back(aux);
+                        aux = sl;
+                        sobr.push_back(aux);
+                        verT = true;
+                        frase = "\n! AVISO ! -> Existe sobreposicao de aulas T com aulas T, e por isso essas aulas nao estao representadas.\n";
                     }
                 }
-                if (s.getFinalHour()-s.getStartHour() == 1.0) {
-                    dBlocos = true;
-                    tBlocos = false;
-                    qBlocos = false;
-                }
-                else if (s.getFinalHour()-s.getStartHour() == 1.5) {
-                    dBlocos = false;
-                    tBlocos = true;
-                    qBlocos = false;
-                }
-                else if (s.getFinalHour()-s.getStartHour() == 2.0) {
-                    dBlocos = false;
-                    tBlocos = false;
-                    qBlocos = true;
-                }
-                int n1;
-                if (v && s.getStartHour() == (h1 + 0.5)) {
-                    n1 = h1%8*4+2;
-                    inserir(n1, tab1, tab2, tab3, tab4, tab5, dBlocos, tBlocos, qBlocos, s, tempTurma);
-                }
-                else if (s.getStartHour() == (h1 + 0.0)) {
-                    n1 = h1%8*4;
-                    inserir(n1, tab1, tab2, tab3, tab4, tab5, dBlocos, tBlocos, qBlocos, s, tempTurma);
-                }
+            }
+            if (verTP) {
+                break;
+            } else {
+                aux.first = s;
+                aux.second = UcTurma(turma.getUcCode(), turma.getClassCode());
+                verifySobr.push_back(aux);
             }
         }
-        h1 += i%2;
     }
-    h1 = 8, h2 = 8;
-    for (int i = 0; i < 24; i++) {
-        h2 += i%2;
-        v = i%2;
-        if (h1 >= 10 && h2 >= 10) {
-            if (v) cout << "|" << h1 << trinta << hifen << h2 << zero << "|";
-            else cout << "|" << h1 << zero << hifen << h2 << trinta << "|";
+    if (!verTP) {
+        cout << "\n+-----------+----------+----------+----------+----------+----------+\n"
+                "|   Horas   | Segunda  |   Terca  |  Quarta  |  Quinta  |   Sexta  |\n"
+                "+-----------+----------+----------+----------+----------+----------+\n";
+        for (int i = 0; i < 24; i++) {
+            h2 += i % 2;
+            v = i%2;
+            for (const UcTurma& turma : turmasEstudante) {
+                TurmaH tempTurma(turma.getUcCode(), turma.getClassCode(), {});
+                n = binarySearch(turmasGerais, tempTurma); // return do indice da ucturma
+                tempTurma = turmasGerais[n];
+                for (const Slot& s : tempTurma.getHorarioUcClass()) {
+                    if (verT) {
+                        bool dentro = false;
+                        for (const pair<Slot, UcTurma>& sl : sobr) {
+                            if (s.getType() == sl.first.getType() && s.getWeekday() == sl.first.getWeekday() && s.getStartHour() == sl.first.getStartHour() && s.getFinalHour() == sl.first.getFinalHour()) dentro = true;
+                        }
+                        if (!dentro) {
+                            if (s.getFinalHour()-s.getStartHour() == 1.0) {
+                                dBlocos = true;
+                                tBlocos = false;
+                                qBlocos = false;
+                            }
+                            else if (s.getFinalHour()-s.getStartHour() == 1.5) {
+                                dBlocos = false;
+                                tBlocos = true;
+                                qBlocos = false;
+                            }
+                            else if (s.getFinalHour()-s.getStartHour() == 2.0) {
+                                dBlocos = false;
+                                tBlocos = false;
+                                qBlocos = true;
+                            }
+                            int n1 = 0;
+                            if (v && s.getStartHour() == (h1 + 0.5)) {
+                                if (h1 >= 16) {
+                                    n1 += 32;
+                                }
+                                n1 += (h1%8)*4+2;
+                                inserir(n1, tab1, tab2, tab3, tab4, tab5, dBlocos, tBlocos, qBlocos, s, tempTurma);
+                            }
+                            else if (s.getStartHour() == (h1 + 0.0)) {
+                                if (h1 >= 16) {
+                                    n1 += 32;
+                                }
+                                n1 += (h1%8)*4;
+                                inserir(n1, tab1, tab2, tab3, tab4, tab5, dBlocos, tBlocos, qBlocos, s, tempTurma);
+                            }
+                        }
+                    }
+                    else {
+                        if (s.getFinalHour()-s.getStartHour() == 1.0) {
+                            dBlocos = true;
+                            tBlocos = false;
+                            qBlocos = false;
+                        }
+                        else if (s.getFinalHour()-s.getStartHour() == 1.5) {
+                            dBlocos = false;
+                            tBlocos = true;
+                            qBlocos = false;
+                        }
+                        else if (s.getFinalHour()-s.getStartHour() == 2.0) {
+                            dBlocos = false;
+                            tBlocos = false;
+                            qBlocos = true;
+                        }
+                        int n1 = 0;
+                        if (v && s.getStartHour() == (h1 + 0.5)) {
+                            if (h1 >= 16) {
+                                n1 += 32;
+                            }
+                            n1 += (h1%8)*4+2;
+                            inserir(n1, tab1, tab2, tab3, tab4, tab5, dBlocos, tBlocos, qBlocos, s, tempTurma);
+                        }
+                        else if (s.getStartHour() == (h1 + 0.0)) {
+                            if (h1 >= 16) {
+                                n1 += 32;
+                            }
+                            n1 += (h1%8)*4;
+                            inserir(n1, tab1, tab2, tab3, tab4, tab5, dBlocos, tBlocos, qBlocos, s, tempTurma);
+                        }
+                    }
+                }
+            }
+            h1 += i%2;
         }
-        else if (h2 >= 10) {
-            if (v) cout << "|0" << h1 << trinta << hifen << h2 << zero << "|";
-            else cout << "|0" << h1 << zero << hifen << h2 << trinta << "|";
-        }
-        else {
-            if (v) cout << "|0" << h1 << trinta << hifen << "0" << h2 << zero << "|";
-            else cout << "|0" << h1 << zero << hifen << "0" << h2 << trinta << "|";
-        }
+        h1 = 8, h2 = 8;
+        for (int i = 0; i < 24; i++) {
+            h2 += i%2;
+            v = i%2;
+            if (h1 >= 10 && h2 >= 10) {
+                if (v) cout << "|" << h1 << trinta << hifen << h2 << zero << "|";
+                else cout << "|" << h1 << zero << hifen << h2 << trinta << "|";
+            }
+            else if (h2 >= 10) {
+                if (v) cout << "|0" << h1 << trinta << hifen << h2 << zero << "|";
+                else cout << "|0" << h1 << zero << hifen << h2 << trinta << "|";
+            }
+            else {
+                if (v) cout << "|0" << h1 << trinta << hifen << "0" << h2 << zero << "|";
+                else cout << "|0" << h1 << zero << hifen << "0" << h2 << trinta << "|";
+            }
 
-        // desenhar as "slots"
-        cout << tab1[i*2] << mais << tab2[i*2] << mais << tab3[i*2] << mais << tab4[i*2] << mais << tab5[i*2] << "|\n";
-        cout << mais << hifens11 << mais << tab1[i*2+1] << mais << tab2[i*2+1] << mais << tab3[i*2+1] << mais << tab4[i*2+1] << mais << tab5[i*2+1] << "|\n";
-        h1 += i%2;
+            // desenhar as "slots"
+            cout << tab1[i*2] << mais << tab2[i*2] << mais << tab3[i*2] << mais << tab4[i*2] << mais << tab5[i*2] << "|\n";
+            cout << mais << hifens11 << mais << tab1[i*2+1] << mais << tab2[i*2+1] << mais << tab3[i*2+1] << mais << tab4[i*2+1] << mais << tab5[i*2+1] << "|\n";
+            h1 += i%2;
+        }
+        cout << frase << endl;
+        for (const pair<Slot, UcTurma>& s : sobr) {
+            cout << s.second.getUcCode() << " " << s.second.getClassCode() << " ";
+            if (s.first.getWeekday() == "Monday") {
+                cout << "Segunda: ";
+            }
+            else if (s.first.getWeekday() == "Tuesday") {
+                cout << "Terca: ";
+            }
+            else if (s.first.getWeekday() == "Wednesday") {
+                cout << "Quarta: ";
+            }
+            else if (s.first.getWeekday() == "Thursday") {
+                cout << "Quinta: ";
+            }
+            else if (s.first.getWeekday() == "Friday") {
+                cout << "Sexta: ";
+            }
+            int aS = s.first.getStartHour(); // parte inteira
+            int bS = ceil(s.first.getStartHour()); // arredondar para cima
+            int aF = s.first.getFinalHour(); // parte inteira
+            int bF = ceil(s.first.getFinalHour()); // arredondar para cima
+            if (aS == bS) cout << aS << ":00-" << aF << ":30 ";
+            else cout << aS << ":30-" << aF << ":00 ";
+            cout << "Tipo: " << s.first.getType() << endl;
+        }
     }
+    else cout << "Sobreposicao de aulas TP ou PL com TP ou PL.\n";
 }
 
 void GestaoH::drawNumberOfStudentsPerUcTurma() const {
@@ -611,7 +718,6 @@ void GestaoH::processarPedidos(){
                                                         turmas.push_back(novaUcTurma);
                                                         newStudent.setTurmas(turmas);
                                                         estudantes_.insert(newStudent);
-                                                        cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da adicao da turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                         ifs.open("../schedule/students_classes.csv");
                                                         ofs.open("../schedule/temp.csv");
                                                         while(getline(ifs, line)){
@@ -637,7 +743,6 @@ void GestaoH::processarPedidos(){
                                                 turmas.push_back(novaUcTurma);
                                                 newStudent.setTurmas(turmas);
                                                 estudantes_.insert(newStudent);
-                                                cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da adicao da turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                 ifs.open("../schedule/students_classes.csv");
                                                 ofs.open("../schedule/temp.csv");
                                                 while(getline(ifs, line)){
@@ -676,7 +781,6 @@ void GestaoH::processarPedidos(){
                             }
                             newStudent.setTurmas(tempaux);
                             estudantes_.insert(newStudent);
-                            cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da remocao da turma " << pedido[n].getInitialClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                             ifs.open("../schedule/students_classes.csv");
                             ofs.open("../schedule/temp.csv");
                             while(getline(ifs, line)){
@@ -703,23 +807,18 @@ void GestaoH::processarPedidos(){
         if(pedido[n].getType() == "T") { // troca de turma
             for(auto& i: estudantes_){
                 if(pedido[n].getStudentCode() == i.getCode()){
-                    cout << "Estudante Correto" << endl;
                     for(auto &a: numberOfStudentsPerUcTurma_){ // preciso de percorrer o vetor 2 vezes
                         for(auto &d: numberOfStudentsPerUcTurma_){ // uma vez que preciso da turma que o estudante está e aquela para a qual ele quer mudar
                             if(a.first.getUcCode() == pedido[n].getUcCode() && d.first.getUcCode() == pedido[n].getUcCode() && a.first.getClassCode() == pedido[n].getInitialClassCode() && d.first.getClassCode() == pedido[n].getFinalClassCode()){ // verifica se s é a turma inicial e d a turma final
-                                cout << "UCTurmas corretas" << endl;
                                 if((abs((a.second-1) - (d.second+1)) < 4) && (d.second < CAP)){ // verifica se a diferença entre o número de estudantes depois da mudança é menor que 4 e se a turma onde vai entrar o aluno está abaixo do limite máximo
-                                    cout << "Diferenca e limite cumpridos" << endl;
                                     turmas = i.getTurmas();
                                     for(const auto& ucturma: turmas) { // percorre a lista de ucturmas de um estudante
                                         for(auto &cadeira: horario_) { // percorre as cadeiras no vetor dos horários
                                             if(ucturma.getUcCode() == cadeira.getUcCode() && ucturma.getClassCode() == cadeira.getClassCode()){ // verifica se é a mesma cadeira e turma e se difere da cadeira que pretendemos mudar
-                                                cout << "horarioUc povoado" << endl;
                                                 horarioUc = cadeira.getHorarioUcClass();
                                                 if(ucturma.getUcCode() != pedido[n].getUcCode()){
                                                     for(auto &aula: horarioUc){ // percorre a lista de horários de uma ucturma específica
                                                         if(aula.getType() == "TP" || aula.getType() == "PL") { // verifica se é a aula teórico-prática ou prática laboratorial
-                                                            cout << "Tipo correto"<< endl;
                                                             if((aula.getWeekday() == novaAula.getWeekday()) && (aula.getStartHour() > novaAula.getFinalHour() || aula.getFinalHour() < novaAula.getStartHour())){ // verifica se é no mesmo dia da semana
                                                                 flag = false;
                                                                 a.second--;
@@ -734,7 +833,6 @@ void GestaoH::processarPedidos(){
                                                                 }
                                                                 newStudent.setTurmas(turmas);
                                                                 estudantes_.insert(newStudent);
-                                                                cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da troca da turma " << pedido[n].getInitialClassCode() << " para a turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                                 ifs.open("../schedule/students_classes.csv");
                                                                 ofs.open("../schedule/temp.csv");
                                                                 while(getline(ifs, line)){
@@ -773,7 +871,6 @@ void GestaoH::processarPedidos(){
                                                     }
                                                     newStudent.setTurmas(turmas);
                                                     estudantes_.insert(newStudent);
-                                                    cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da troca da turma " << pedido[n].getInitialClassCode() << " para a turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                     ifs.open("../schedule/students_classes.csv");
                                                     ofs.open("../schedule/temp.csv");
                                                     while(getline(ifs, line)){
@@ -793,7 +890,6 @@ void GestaoH::processarPedidos(){
                                                     rename("../schedule/temp.csv", "students_classes.csv");
                                                 }
                                                 if(flag){
-                                                    cout << "Nenhuma cadeira no mesmo dia" << endl;
                                                     a.second--;
                                                     d.second++;
                                                     newStudent = i;
@@ -806,7 +902,6 @@ void GestaoH::processarPedidos(){
                                                     }
                                                     newStudent.setTurmas(turmas);
                                                     estudantes_.insert(newStudent);
-                                                    cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da troca da turma " << pedido[n].getInitialClassCode() << " para a turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                     ifs.open("../schedule/students_classes.csv");
                                                     ofs.open("../schedule/temp.csv");
                                                     while(getline(ifs, line)){
@@ -839,23 +934,18 @@ void GestaoH::processarPedidos(){
             if(pedido[n].getType() == "CT"){
                 for(auto& i: estudantes_){
                     if(pedido[n].getStudentCode() == i.getCode()){
-                        cout << "Estudante Correto" << endl;
                         for(auto &a: numberOfStudentsPerUcTurma_){ // preciso de percorrer o vetor 2 vezes
                             for(auto &d: numberOfStudentsPerUcTurma_){ // uma vez que preciso da turma que o estudante está e aquela para a qual ele quer mudar
                                 if(a.first.getUcCode() == pedido[n].getUcCode() && d.first.getUcCode() == pedido[n].getUcCode() && a.first.getClassCode() == pedido[n].getInitialClassCode() && d.first.getClassCode() == pedido[n].getFinalClassCode()){ // verifica se s é a turma inicial e d a turma final
-                                    cout << "UCTurmas corretas" << endl;
                                     if((abs((a.second-1) - (d.second+1)) < 4) && (d.second < CAP)){ // verifica se a diferença entre o número de estudantes depois da mudança é menor que 4 e se a turma onde vai entrar o aluno está abaixo do limite máximo
-                                        cout << "Diferenca e limite cumpridos" << endl;
                                         turmas = i.getTurmas();
                                         for(const auto& ucturma: turmas) { // percorre a lista de ucturmas de um estudante
                                             for(auto &cadeira: horario_) { // percorre as cadeiras no vetor dos horários
                                                 if(ucturma.getUcCode() == cadeira.getUcCode() && ucturma.getClassCode() == cadeira.getClassCode()){ // verifica se é a mesma cadeira e turma e se difere da cadeira que pretendemos mudar
-                                                    cout << "horarioUc povoado" << endl;
                                                     horarioUc = cadeira.getHorarioUcClass();
                                                     if(ucturma.getUcCode() != pedido[n].getUcCode()){
                                                         for(auto &aula: horarioUc){ // percorre a lista de horários de uma ucturma específica
                                                             if(aula.getType() == "TP" || aula.getType() == "PL") { // verifica se é a aula teórico-prática ou prática laboratorial
-                                                                cout << "Tipo correto"<< endl;
                                                                 if((aula.getWeekday() == novaAula.getWeekday()) && (aula.getStartHour() > novaAula.getFinalHour() || aula.getFinalHour() < novaAula.getStartHour())){ // verifica se é no mesmo dia da semana
                                                                     flag = false;
                                                                     a.second--;
@@ -870,7 +960,6 @@ void GestaoH::processarPedidos(){
                                                                     }
                                                                     newStudent.setTurmas(turmas);
                                                                     estudantes_.insert(newStudent);
-                                                                    cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da troca da turma " << pedido[n].getInitialClassCode() << " para a turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                                     ifs.open("../schedule/students_classes.csv");
                                                                     ofs.open("../schedule/temp.csv");
                                                                     while(getline(ifs, line)){
@@ -909,7 +998,6 @@ void GestaoH::processarPedidos(){
                                                         }
                                                         newStudent.setTurmas(turmas);
                                                         estudantes_.insert(newStudent);
-                                                        cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da troca da turma " << pedido[n].getInitialClassCode() << " para a turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                         ifs.open("../schedule/students_classes.csv");
                                                         ofs.open("../schedule/temp.csv");
                                                         while(getline(ifs, line)){
@@ -929,7 +1017,6 @@ void GestaoH::processarPedidos(){
                                                         rename("../schedule/temp.csv", "students_classes.csv");
                                                     }
                                                     if(flag){
-                                                        cout << "Nenhuma cadeira no mesmo dia" << endl;
                                                         a.second--;
                                                         d.second++;
                                                         newStudent = i;
@@ -942,7 +1029,6 @@ void GestaoH::processarPedidos(){
                                                         }
                                                         newStudent.setTurmas(turmas);
                                                         estudantes_.insert(newStudent);
-                                                        cout << "Pedido do estudante up" << pedido[n].getStudentCode() << " da troca da turma " << pedido[n].getInitialClassCode() << " para a turma " << pedido[n].getFinalClassCode() << " na unidade curricular " << pedido[n].getUcCode() << " efetuado com sucesso" << endl;
                                                         ifs.open("../schedule/students_classes.csv");
                                                         ofs.open("../schedule/temp.csv");
                                                         while(getline(ifs, line)){
