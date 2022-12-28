@@ -6,7 +6,13 @@ Slot::Slot() {
     finalHour_ = 0.0;
     type_ = "";
 }
-
+/**
+ * Construtor que recebe a startHour e a duration de cada aula e soma os dois criando uma FinalHour.
+ * @param weekday
+ * @param startHour
+ * @param duration
+ * @param type
+ */
 Slot::Slot(const string& weekday, double startHour, double duration, const string& type) {
     weekday_ = weekday;
     startHour_ = startHour;

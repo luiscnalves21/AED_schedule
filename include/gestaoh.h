@@ -15,18 +15,17 @@ class GestaoH {
     public:
         // constructors
         GestaoH(); // default constructor
-        GestaoH(set<Student> estudantes, vector<TurmaH> horario, queue<vector<Pedido>> pedido, vector<pair<UcTurma, int>> numberOfStudentsPerUcTurma);
 
         // methods
-        void lerClasses(); // lê o ficheiro classes.csv e guarda as informações num vector<TurmaH>
+        void lerClasses(); // lê o ficheiro classes.csv e guarda as informações num vetor<TurmaH>
         void lerStudentClasses(); // lê o ficheiro student_classes.csv
 
         // draw methods
         void drawEstudantes(set<Student> estudantes, bool simple) const; // desenha um set de estudantes
         void drawEstudante(const Student& estudante, bool header, bool simple) const; // desenha um estudante, e caso seja true, desenha também o header
-        void drawHorario() const; // desenha um vector de turmas
+        void drawHorario() const; // desenha um vetor de turmas
         void drawHorarioEstudante(const Student& estudante) const; // desenha o horário de um estudante
-        void drawNumberOfStudentsPerUcTurma() const; // desenha o numero de estudantes por uc/turma
+        void drawNumberOfStudentsPerUcTurma() const; // desenha o número de estudantes por uc/turma
         static void drawPedido(); // desenha o pedido
         static void drawMenu(); // desenha o menu
         static bool mostrarSpecs(); // pergunta se quer mostar as specs dos estudantes
@@ -34,7 +33,7 @@ class GestaoH {
         // getters
         set<Student> getEstudantes() const;
         vector<TurmaH> getHorario() const;
-        queue<vector<Pedido>> getPedido() const; // ! FALTA IMPLEMENTAR !
+        queue<vector<Pedido>> getPedido() const;
         Student getSpecificStudent() const; // return de um estudante específico de um set de estudantes
         vector<pair<UcTurma, int>> getNumberOfStudentsPerUcTurma() const;
         int getMaxLength() const; // return do tamanho máximo de um nome de estudante do set de estudantes
@@ -47,7 +46,7 @@ class GestaoH {
         void setMaxLength(int maxLength);
 
         // other functions
-        void addPedido(const vector<Pedido>& pedido); // ! FALTA IMPLEMENTAR !
+        void addPedido(const vector<Pedido>& pedido);
         void processarPedidos();
         void addNumberOfStudentsPerUcTurma(const UcTurma& ucTurma);
         set<Student> studentsPerYear();

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include<fstream>
 #include "./include/student.h"
 #include "./include/turmah.h"
 #include "./include/pedido.h"
@@ -97,7 +98,6 @@ int main() {
         }
         else if (op == "9"){ // operação para adicionar pedido
             vector<Pedido> pedido;
-            queue<vector<Pedido>> pedido_;
             int n;
             string uc, initialClass, tipo, finalClass;
             while (true) {
@@ -109,10 +109,9 @@ int main() {
                     cout << "\nIndique a unidade curricular: "; cin >> uc;
                     cout << "\nIndique a turma que pretende ficar: "; cin >> finalClass;
                     tipo = "A";
-                    //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
                     Pedido aux = Pedido(n, tipo, initialClass, finalClass, uc);
                     pedido.push_back(aux);
-                    pedido_.push(pedido);
+                    h.addPedido(pedido);
                     pedido.clear();
                 }
                 else if (p == "R" || p == "r") {
@@ -120,10 +119,9 @@ int main() {
                     cout << "\nIndique a unidade curricular: "; cin >> uc;
                     cout << "\nIndique a turma que pretende remover: "; cin >> initialClass;
                     tipo = "R";
-                    //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
                     Pedido aux = Pedido(n, tipo, initialClass, finalClass, uc);
                     pedido.push_back(aux);
-                    pedido_.push(pedido);
+                    h.addPedido(pedido);
                     pedido.clear();
                 }
                 else if (p == "T" || p == "t") {
@@ -132,10 +130,9 @@ int main() {
                     cout << "\nIndique a turma em que esta de momento: "; cin >> initialClass;
                     cout << "\nIndique a turma para onde pretende mudar: "; cin >> finalClass;
                     tipo = "T";
-                    //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
                     Pedido aux = Pedido(n, tipo, initialClass, finalClass, uc);
                     pedido.push_back(aux);
-                    pedido_.push(pedido);
+                    h.addPedido(pedido);
                     pedido.clear();
                 }
                 else if (p == "C" || p == "c") {
@@ -145,7 +142,6 @@ int main() {
                         cout << "\nIndique a unidade curricular: "; cin >> uc;
                         cout << "\nIndique a turma em que esta de momento: "; cin >> initialClass;
                         cout << "\nIndique a turma para onde pretende mudar: "; cin >> finalClass;
-                        //é preciso verificar se uc e initialClass/finalClass estão bem escritos! (uc deve ter LEIC ou UP na string e as turmas devem ter L.EIC)
                         Pedido aux = Pedido(n, tipo, initialClass, finalClass, uc);
                         pedido.push_back(aux);
                         cout << "\nPressione S para sair, N para outro pedido: ";
@@ -154,7 +150,7 @@ int main() {
                             break;
                         }
                     }
-                    pedido_.push(pedido);
+                    h.addPedido(pedido);
                     pedido.clear();
                 }
                 else if (p == "V" || p == "v") {
@@ -164,14 +160,29 @@ int main() {
                     Menu::teclaErro();
                     continue;
                 }
-                h.setPedido(pedido_);
             }
         }
         else if(op == "P" || op == "p"){
             h.processarPedidos();
             Menu::voltar();
         }
-        else if (op == "q" || op == "Q") break;
+        else if (op == "q" || op == "Q"){
+            ofstream ofs;
+            ofs.open("../students_classes.csv", std::fstream::trunc);
+            set<Student> aux = h.getEstudantes();
+            list<UcTurma> temp;
+            string code;
+            ofs << "StudentCode,StudentName,UcCode,ClassCode" << endl;
+            for(auto& i: aux){
+                temp = i.getTurmas();
+                code = to_string(i.getCode());
+                for(auto &t: temp){
+                    ofs << code << ',' << i.getName() << ',' << t.getUcCode() << ',' << t.getClassCode() << endl;
+                }
+            }
+            ofs.close();
+            break;
+        }
         else Menu::teclaErro();
     }
     return 0;

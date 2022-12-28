@@ -7,6 +7,7 @@
 #include <cmath>
 #include <algorithm>
 
+
 GestaoH::GestaoH() {
     estudantes_ = set<Student> {};
     horario_ = vector<TurmaH> {};
@@ -14,25 +15,23 @@ GestaoH::GestaoH() {
     numberOfStudentsPerUcTurma_ = vector<pair<UcTurma, int>> {};
 }
 
-GestaoH::GestaoH(set<Student> estudantes, vector<TurmaH> horario, queue<vector<Pedido>> pedido, vector<pair<UcTurma, int>> numberOfStudentsPerUcTurma) {
-    estudantes_ = std::move(estudantes); // em vez de fazer estudantes_ = estudantes fazemos
-    horario_ = std::move(horario);       // isso para não copiarmos o objeto duas vezes
-    pedido_ = std::move(pedido);         // (sugestão do CLion)
-    numberOfStudentsPerUcTurma_ = std::move(numberOfStudentsPerUcTurma);
-}
 
+/**
+ * Função que efetua a leitura do ficheiro "classes.csv" e preenche o vetor horario que contém o horário de todas as turmas nas respetivas unidades curriculares.
+ * Complexidade Temporal O(n*log(n))
+ */
 void GestaoH::lerClasses() {
     string line1, line2, temp, word;
     string classCode1, classCode2, ucCode1, ucCode2, weekday, sstartHour, sduration, type, tempClassCode, tempUcCode;
     double startHour, duration;
     Slot aux;
-    vector<TurmaH> horario; // criar vector de ucCode/classCode e uma list<Slot>
-    string ficheiro = "../schedule/classes.csv";
+    vector<TurmaH> horario; // criar vetor de ucCode/classCode e uma list<Slot>
+    string ficheiro = "../classes.csv";
     ifstream ifs1, ifs2;
     list<Slot> slot; // criar lista de slots para cada ucCode/classCode
     ifs1.open(ficheiro, ios::in);
     getline(ifs1, temp);
-    // objetivo aqui é fazer dois ciclos para correr o ficheiro todo
+    // objetivo aqui é fazer dois ciclos para correr o ficheiro completo
     // visto que as mesmas ucCode/classCode não estão seguidas no ficheiro
     while(getline(ifs1, line1)) {
         stringstream s1(line1);
@@ -58,7 +57,10 @@ void GestaoH::lerClasses() {
     }
     setHorario(horario); // povoar o vector<TurmaH>
 }
-
+/**
+ * Função que efetua a leitura do ficheiro "students_classes.csv" e preenche o set estudantes onde se encontra o código e o nome de estudantes e a lista de unidades curriculares e respetivas turmas de cada um.
+ * Complexidade Temporal O(log n)
+ */
 void GestaoH::lerStudentClasses() {
     string line, temp, word, sstudentCode, studentName, ucCode, classCode, tempStudentName; // tempStudentName para guardar o nome estudante anterior
     int tempSstudentCode; // para guardar o código do estudante anterior
@@ -66,7 +68,7 @@ void GestaoH::lerStudentClasses() {
     list<UcTurma> listaUcTurma; // criar lista de ucTurma para cada estudante
     UcTurma ucTurma; // criar UcTurma para cada conjunto de ucCode/classCode
     vector<pair<UcTurma, int>> studentsPerUcTurma;
-    string ficheiro = "../schedule/students_classes.csv";
+    string ficheiro = "../students_classes.csv";
     ifstream ifs;
     ifs.open(ficheiro, ios::in); // abre ficheiro
     getline(ifs, temp); // passa a primeira linha à frente
@@ -80,7 +82,7 @@ void GestaoH::lerStudentClasses() {
             Student estudante(tempSstudentCode, tempStudentName, listaUcTurma); // criar um objeto estudante
             estudantes.insert(estudante); // adicionar esse objeto estudante ao set<Student>
             listaUcTurma = {}; // esvaziar a list<UcTurma>
-            // o próximo if é só para saber qual o tamanho do maior nome de um estudante
+            // o próximo if é só para determinar o tamanho do maior nome de um estudante
             if (tempStudentName.length() > getMaxLength()) {
                 setMaxLength((int)tempStudentName.length());
             }
@@ -94,7 +96,7 @@ void GestaoH::lerStudentClasses() {
                 break;
             }
         }
-        if (!verifyUcTurma) { // se não, cria uma nova ucturma e coloca no vetor
+        if(!verifyUcTurma) { // se não, cria uma ucturma e coloca no vetor
             aux.setUcCode(ucCode);
             aux.setClassCode(classCode);
             pair<UcTurma, int> numberOfStudent = {aux, 1};
@@ -117,8 +119,13 @@ void GestaoH::lerStudentClasses() {
     setEstudantes(estudantes); // povoar o set<Student>
 }
 
-// funções auxiliares para desenhar
-// função para ajudar a centralizar textos
+
+/**
+ * Função para ajudar a centralizar textos.
+ * @param n
+ * @param v
+ * @return
+ */
 pair<int, int> auxCenterDraw(int n, bool v) {
     int pad1 = n;
     int pad2;
@@ -131,7 +138,10 @@ pair<int, int> auxCenterDraw(int n, bool v) {
     return pair<int, int> {pad1, pad2};
 }
 
-// ajuda a desenhar as horas das slots
+/**
+ * Ajuda a desenhar as horas das slots.
+ * @param n
+ */
 void auxHourDraw(double n) {
     bool flag_decimal = true;
     bool flag_two_digits = false;
@@ -145,7 +155,10 @@ void auxHourDraw(double n) {
     else cout << "    " << n << "     |";
 }
 
-// ajuda a desenhar o tipo das slots
+/**
+ * Ajuda a desenhar o tipo das slots.
+ * @param type
+ */
 void auxTypeDraw(const string& type) {
     switch (type.length()) {
         case 1:
@@ -157,6 +170,13 @@ void auxTypeDraw(const string& type) {
     }
 }
 
+/**
+ * Função desenha um gráfico com um bool header se for o primeiro estudante da lista a aparecer ou bool simple se for necessário só imprimir o estudante.
+ * Complexidade Temporal O(n)
+ * @param estudante
+ * @param header
+ * @param simple
+ */
 void GestaoH::drawEstudante(const Student& estudante, bool header, bool simple) const {
     // desenha o cabeçalho quando é o primeiro estudante
     if (header) {
@@ -214,6 +234,12 @@ void GestaoH::drawEstudante(const Student& estudante, bool header, bool simple) 
     }
 }
 
+/**
+ * O mesmo que a função drawEstudante, mas com um loop para fazer todos os estudantes.
+ * Complexidade Temporal O(n^2)
+ * @param estudantes
+ * @param simple
+ */
 void GestaoH::drawEstudantes(set<Student> estudantes, bool simple) const {
     if (estudantes.empty()) {
         estudantes = getEstudantes();
@@ -224,7 +250,10 @@ void GestaoH::drawEstudantes(set<Student> estudantes, bool simple) const {
         v = 0;
     }
 }
-
+/**
+ * Função que desenha o horário de uma unidade curricular e respetiva turma.
+ * Complexidade Temporal O(n^3)
+ */
 void GestaoH::drawHorario() const {
     vector<TurmaH> horario = getHorario();
     cout << "\n+----------+-----------+-------------+----------+----------+-------+\n"
@@ -263,7 +292,13 @@ void GestaoH::drawHorario() const {
         }
     }
 }
-
+/**
+ * Função de binary search.
+ * Complexidade Temporal O(log n)
+ * @param v
+ * @param key
+ * @return key if found, -1 if not found
+ */
 int binarySearch(const vector<TurmaH>& v, const TurmaH& key) {
     int low = 0, high = (int)v.size()-1;
     while (low <= high) {
@@ -274,7 +309,21 @@ int binarySearch(const vector<TurmaH>& v, const TurmaH& key) {
     }
     return -1;
 }
-
+/**
+ * Cada dia é representado por um vetor e os blocos de aulas serão inseridos no respetivo vetor.
+ * Complexidade Temporal O(1)
+ * @param n1
+ * @param tab1
+ * @param tab2
+ * @param tab3
+ * @param tab4
+ * @param tab5
+ * @param dBlocos
+ * @param tBlocos
+ * @param qBlocos
+ * @param s
+ * @param tempTurma
+ */
 void inserir(int n1, vector<string>& tab1, vector<string>& tab2, vector<string>& tab3, vector<string>& tab4, vector<string>& tab5, bool dBlocos, bool tBlocos, bool qBlocos, const Slot& s, const TurmaH& tempTurma) {
     if (s.getWeekday() == "Monday") {
         tab1[n1] = " " + tempTurma.getUcCode() + " ";
@@ -357,7 +406,11 @@ void inserir(int n1, vector<string>& tab1, vector<string>& tab2, vector<string>&
         }
     }
 }
-
+/**
+ * Desenha o horário de um estudante.
+ * Complexidade Temporal O(n^3)
+ * @param estudante
+ */
 void GestaoH::drawHorarioEstudante(const Student& estudante) const {
     list<UcTurma> turmasEstudante = estudante.getTurmas(); // turmas do estudante
     vector<TurmaH> turmasGerais = horario_; // todas as turmas
@@ -547,7 +600,10 @@ void GestaoH::drawHorarioEstudante(const Student& estudante) const {
     }
     else cout << "Sobreposicao de aulas TP ou PL com TP ou PL.\n";
 }
-
+/**
+ * Desenha o número de estudantes por turma na respetiva unidade curricular
+ * Complexidade Temporal O(n)
+ */
 void GestaoH::drawNumberOfStudentsPerUcTurma() const {
     vector<pair<UcTurma, int>> nOS = getNumberOfStudentsPerUcTurma();
     sort(nOS.begin(), nOS.end());
@@ -563,7 +619,10 @@ void GestaoH::drawNumberOfStudentsPerUcTurma() const {
         cout << "+----------+-----------+----------+\n";
     }
 }
-
+/**
+ * Desenho do Menu principal
+ * Complexidade Temporal O(1)
+ */
 void GestaoH::drawMenu() {
     cout << "\n+---------------------------------------------+\n"
             "|           GESTAO DE HORARIOS                |\n"
@@ -582,7 +641,10 @@ void GestaoH::drawMenu() {
             "+---------------------------------------------+\n";
     cout << "\nEscolha a opcao e pressione ENTER:";
 }
-
+/**
+ * Desenho do menu de Pedidos
+ * Complexidade Temporal O(1)
+ */
 void GestaoH::drawPedido() {
     cout << "\n+-----------------------------------------+\n"
             "|               FAZER PEDIDO              |\n"
@@ -595,6 +657,11 @@ void GestaoH::drawPedido() {
             "+-----------------------------------------+\n";
     cout << "\nEscolha a opcao e pressione ENTER:";
 }
+
+/**
+ * Caso o input do utilizador seja S vai mostrar as unidades curriculares e as respetivas turmas de cada estudante
+ * @return true se S para sim for pressionado, False se N para não for pressionado
+ */
 
 bool GestaoH::mostrarSpecs() {
     string op;
@@ -646,7 +713,7 @@ int GestaoH::getMaxLength() const {
     return maxLength_;
 }
 
-void GestaoH::setEstudantes(set<Student> estudantes) {
+void GestaoH::setEstudantes(set<Student> estudantes){
     estudantes_ = std::move(estudantes);
 }
 
@@ -669,258 +736,165 @@ void GestaoH::setMaxLength(int maxLength) {
 void GestaoH::addPedido(const vector<Pedido>& pedido){
     pedido_.push(pedido);
 }
-
+/**
+ * Função que processa os pedidos que se encontram na fila de espera.
+ * Complexidade Temporal O(n^6 * log(n))
+ */
 void GestaoH::processarPedidos(){
-    vector<Pedido> pedido;
+    vector<Pedido> pedidoaux = {};
     UcTurma novaUcTurma;
-    Student newStudent;
-    list<UcTurma> turmas;
-    list<Slot> horarioUc;
+    Student novoStudent;
     Slot novaAula;
-    ofstream ofs;
-    ifstream ifs;
-    string line, sstudentCode, studentName, ucCode, classCode;
+    int counter = 0;
     int CAP = 26; // capacidade máxima de uma turma (pode ser alterado)
     bool flag = false;
-    while(!pedido_.empty()){ // enquanto a queue não estiver vazia
-        pedido = pedido_.front(); // buscar o primeiro elemento da queue
-        unsigned n = 0;
-        for(auto& index : horario_){ // vai buscar ao vetor dos horários o slot da aula TP ou PL que a turma para que quer mudar vai ocupar
-            if(index.getUcCode() == pedido[n].getUcCode() && index.getClassCode() == pedido[n].getFinalClassCode()){
-                for(const auto& e: index.getHorarioUcClass()){
-                    if(e.getType() == "TP" || e.getType() == "PL"){
-                        novaAula = e;
-                    }
-                }
-            }
-        }
-        if(pedido[n].getType() == "A"){ // adicionar a uma turma
-            for(auto& i: estudantes_){ // percorre o set estudantes
-                if(pedido[n].getStudentCode() == i.getCode()){ // verifica o código de estudante com o do pedido
-                    for(auto &a: numberOfStudentsPerUcTurma_){ // percorre o vetor numberOfStudentsPerUcTurma_
-                        if(a.first.getUcCode() == pedido[n].getUcCode() && a.first.getClassCode() == pedido[n].getFinalClassCode()){ // verifica se é a turma e unidade curricular correta
-                            if(a.second < CAP){ // verifica se o número de estudantes na ucturma não está no limite, para se poder por mais 1 aluno
-                                turmas = i.getTurmas();
-                                for(const auto& ucturma: turmas){ // percorre a lista de ucturmas de um estudante
-                                    for(auto& cadeira: horario_){ // percorre as cadeiras no vetor dos horários
-                                        if((ucturma.getUcCode() == cadeira.getUcCode() && ucturma.getClassCode() == cadeira.getClassCode())){ // verifica se é a mesma cadeira e turma e se o estudante já está inscrito na cadeira
-                                            horarioUc = cadeira.getHorarioUcClass();
-                                            for(auto& aula: horarioUc){ // percorre a lista de horários de uma ucturma específica
-                                                if(aula.getType() == "TP" || aula.getType() == "PL"){ // verifica se é a aula teórico-prática ou prática laboratorial
-                                                    if((aula.getWeekday() == novaAula.getWeekday()) && (aula.getStartHour() > novaAula.getFinalHour() || aula.getFinalHour() < novaAula.getStartHour())){ // verifica se é no mesmo dia da semana
-                                                        flag = false;
-                                                        newStudent = i; // foi necessário remover o estudante do set
-                                                        estudantes_.erase(i); // para se poder inserir um novo
-                                                        turmas = i.getTurmas(); // uma vez que não é possível alterar os valores já no set
-                                                        a.second++;
-                                                        novaUcTurma.setClassCode(pedido[n].getFinalClassCode());
-                                                        novaUcTurma.setUcCode(pedido[n].getUcCode());
-                                                        turmas.push_back(novaUcTurma);
-                                                        newStudent.setTurmas(turmas);
-                                                        estudantes_.insert(newStudent);
-                                                        ifs.open("../schedule/students_classes.csv");
-                                                        ofs.open("../schedule/temp.csv");
-                                                        while(getline(ifs, line)){
-                                                            ofs << line << '\n';
-                                                        }
-                                                        ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode();
-                                                        remove("../schedule/students_classes.csv");
-                                                        rename("../schedule/temp.csv", "students_classes.csv");
-                                                    }
-                                                    else if(aula.getWeekday() != novaAula.getWeekday()){
-                                                        flag = true;
-                                                    }
-                                                }
-                                            }
-                                            if(flag){ // Está a escrever a aceitacao do pedido 2x !!!!
-                                                flag = false;
-                                                newStudent = i; // foi necessário remover o estudante do set
-                                                estudantes_.erase(i); // para se poder inserir um novo
-                                                turmas = i.getTurmas(); // uma vez que não é possível alterar os valores já no set
-                                                a.second++;
-                                                novaUcTurma.setClassCode(pedido[n].getFinalClassCode());
-                                                novaUcTurma.setUcCode(pedido[n].getUcCode());
-                                                turmas.push_back(novaUcTurma);
-                                                newStudent.setTurmas(turmas);
-                                                estudantes_.insert(newStudent);
-                                                ifs.open("../schedule/students_classes.csv");
-                                                ofs.open("../schedule/temp.csv");
-                                                while(getline(ifs, line)){
-                                                    ofs << line << '\n';
-                                                }
-                                                ofs << to_string(pedido[n].getStudentCode()) << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode() << '\n';
-                                                remove("../schedule/students_classes.csv");
-                                                rename("../schedule/temp.csv", "students_classes.csv");
-                                            }
-                                        }
-                                    }
-                                }
+    while(!pedido_.empty()) {
+        pedidoaux = pedido_.front();
+        counter = 0;
+        for (Pedido &temp: pedidoaux) {
+            if (temp.getType() == "A") {
+                for (TurmaH &turmah: horario_) {
+                    if (turmah.getUcCode() == temp.getUcCode() && turmah.getClassCode() == temp.getFinalClassCode()) {
+                        list<Slot> horarioUc = std::move(turmah.getHorarioUcClass());
+                        for (Slot &horario: horarioUc) {
+                            if (horario.getType() == "TP" || horario.getType() == "PL") {
+                                novaAula = horario;
                             }
                         }
                     }
                 }
-            }
-        }
-        if(pedido[n].getType() == "R"){ // remover de uma turma (Funciona)
-            list<UcTurma> tempaux = {};
-            for(auto& i: estudantes_){
-                if(pedido[n].getStudentCode() == i.getCode()){
-                    for(auto &a: numberOfStudentsPerUcTurma_){
-                        if(a.first.getUcCode() == pedido[n].getUcCode() && a.first.getClassCode() == pedido[n].getInitialClassCode()){ // aqui não será necessário verificar o número de estudantes
-                            newStudent = i; // de uma turma, visto que nunca poderá passar do limite e não existe limite mínimo
-                            estudantes_.erase(i);
-                            turmas = i.getTurmas();
-                            a.second--;
-                            for(const auto& itr: turmas){ // percorre a lista de ucturmas de um estudante
-                                if(itr.getUcCode() == pedido[n].getUcCode() && itr.getClassCode() == pedido[n].getInitialClassCode()){ // verificação da ucturma
-                                    continue; // passar a frente a que se quer remover
-                                }
-                                else{
-                                    tempaux.push_back(itr); // adicionar o resto
-                                }
-                            }
-                            newStudent.setTurmas(tempaux);
-                            estudantes_.insert(newStudent);
-                            ifs.open("../schedule/students_classes.csv");
-                            ofs.open("../schedule/temp.csv");
-                            while(getline(ifs, line)){
-                                stringstream s(line);
-                                getline(s, sstudentCode, ','), getline(s, studentName, ','), getline(s, ucCode, ','), getline(s, classCode, '\r');
-                                stringstream conv(sstudentCode);
-                                int x = 0;
-                                conv >> x;
-                                if(x == pedido[n].getStudentCode() && studentName == newStudent.getName() && ucCode == pedido[n].getUcCode() && classCode == pedido[n].getInitialClassCode()){
-                                    continue;
-                                }
-                                else{
-                                    ofs << line << '\n';
-                                }
-                            }
-                            ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode();
-                            remove("../students_classes.csv");
-                            rename("temp.csv", "students_classes.csv");
-                        }
-                    }
-                }
-            }
-        }
-        if(pedido[n].getType() == "T") { // troca de turma
-            for(auto& i: estudantes_){
-                if(pedido[n].getStudentCode() == i.getCode()){
-                    for(auto &a: numberOfStudentsPerUcTurma_){ // preciso de percorrer o vetor 2 vezes
-                        for(auto &d: numberOfStudentsPerUcTurma_){ // uma vez que preciso da turma que o estudante está e aquela para a qual ele quer mudar
-                            if(a.first.getUcCode() == pedido[n].getUcCode() && d.first.getUcCode() == pedido[n].getUcCode() && a.first.getClassCode() == pedido[n].getInitialClassCode() && d.first.getClassCode() == pedido[n].getFinalClassCode()){ // verifica se s é a turma inicial e d a turma final
-                                if((abs((a.second-1) - (d.second+1)) < 4) && (d.second < CAP)){ // verifica se a diferença entre o número de estudantes depois da mudança é menor que 4 e se a turma onde vai entrar o aluno está abaixo do limite máximo
-                                    turmas = i.getTurmas();
-                                    for(const auto& ucturma: turmas) { // percorre a lista de ucturmas de um estudante
-                                        for(auto &cadeira: horario_) { // percorre as cadeiras no vetor dos horários
-                                            if(ucturma.getUcCode() == cadeira.getUcCode() && ucturma.getClassCode() == cadeira.getClassCode()){ // verifica se é a mesma cadeira e turma e se difere da cadeira que pretendemos mudar
-                                                horarioUc = cadeira.getHorarioUcClass();
-                                                if(ucturma.getUcCode() != pedido[n].getUcCode()){
-                                                    for(auto &aula: horarioUc){ // percorre a lista de horários de uma ucturma específica
-                                                        if(aula.getType() == "TP" || aula.getType() == "PL") { // verifica se é a aula teórico-prática ou prática laboratorial
-                                                            if((aula.getWeekday() == novaAula.getWeekday()) && (aula.getStartHour() > novaAula.getFinalHour() || aula.getFinalHour() < novaAula.getStartHour())){ // verifica se é no mesmo dia da semana
+                for (Student student: estudantes_) {
+                    if (temp.getStudentCode() == student.getCode()) {
+                        list<UcTurma> turmas = student.getTurmas();
+                        for (pair<UcTurma, int> &number: numberOfStudentsPerUcTurma_) {
+                            if (number.first.getUcCode() == temp.getUcCode() &&
+                                number.first.getClassCode() == temp.getFinalClassCode()) {
+                                if (number.second < CAP) {
+                                    for (UcTurma ucturma: turmas) {
+                                        for (TurmaH &turma: horario_) {
+                                            if (turma.getUcCode() == ucturma.getUcCode() &&
+                                                turma.getClassCode() == ucturma.getClassCode()) {
+                                                list<Slot> horarioUc = turma.getHorarioUcClass();
+                                                for (Slot &aula: horarioUc) {
+                                                    if (aula.getType() == "TP" || aula.getType() == "PL") {
+                                                        if (aula.getWeekday() == novaAula.getWeekday()) {
+                                                            if ((aula.getStartHour() == novaAula.getStartHour() &&
+                                                                 aula.getFinalHour() == novaAula.getFinalHour()) ||
+                                                                (aula.getStartHour() < novaAula.getFinalHour() &&
+                                                                 aula.getStartHour() > novaAula.getStartHour()) ||
+                                                                (aula.getFinalHour() < novaAula.getFinalHour() &&
+                                                                 aula.getFinalHour() > novaAula.getStartHour())) {
                                                                 flag = false;
-                                                                a.second--;
-                                                                d.second++;
-                                                                newStudent = i;
-                                                                estudantes_.erase(i);
-                                                                turmas = i.getTurmas();
-                                                                for(auto &turma: turmas) { // percorre a lista de ucturmas do estudante
-                                                                    if(turma.getUcCode() == pedido[n].getUcCode() && turma.getClassCode() == pedido[n].getInitialClassCode()) { // verifica se é a ucturma correta
-                                                                        turma.setClassCode(pedido[n].getFinalClassCode()); // troca na lista o código da turma
-                                                                    }
-                                                                }
-                                                                newStudent.setTurmas(turmas);
-                                                                estudantes_.insert(newStudent);
-                                                                ifs.open("../schedule/students_classes.csv");
-                                                                ofs.open("../schedule/temp.csv");
-                                                                while(getline(ifs, line)){
-                                                                    stringstream s(line);
-                                                                    getline(s, sstudentCode, ','), getline(s, studentName, ','), getline(s, ucCode, ','), getline(s, classCode, '\r');
-                                                                    stringstream conv(sstudentCode);
-                                                                    int x = 0;
-                                                                    conv >> x;
-                                                                    if(x == pedido[n].getStudentCode() && studentName == newStudent.getName() && ucCode == pedido[n].getUcCode() && classCode == pedido[n].getInitialClassCode()){
-                                                                        ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode() << endl;
-                                                                    }
-                                                                    else{
-                                                                        ofs << line << '\n';
-                                                                    }
-                                                                }
-                                                                remove("../schedule/students_classes.csv");
-                                                                rename("../schedule/temp.csv", "students_classes.csv");
+                                                                counter++;
                                                             }
-                                                            else if(aula.getWeekday() != novaAula.getWeekday()){
+                                                        } else if (aula.getWeekday() != novaAula.getWeekday()) {
+                                                            flag = true;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (temp.getType() == "R") {
+                list<UcTurma> tempaux = {};
+                for (Student student: estudantes_) {
+                    if (student.getCode() == temp.getStudentCode()) {
+                        list<UcTurma> turmas = student.getTurmas();
+                        for (pair<UcTurma, int> &number: numberOfStudentsPerUcTurma_) {
+                            if (number.first.getUcCode() == temp.getUcCode() &&
+                                number.first.getClassCode() == temp.getInitialClassCode()) {
+                                number.second--;
+                                novoStudent = student;
+                                estudantes_.erase(student);
+                                novaUcTurma.setUcCode(temp.getUcCode());
+                                novaUcTurma.setClassCode(temp.getInitialClassCode());
+                                for (auto itr: turmas) {
+                                    if (itr.getUcCode() == novaUcTurma.getUcCode() &&
+                                        itr.getClassCode() == novaUcTurma.getClassCode()) {
+                                        continue;
+                                    } else {
+                                        tempaux.push_back(itr);
+                                    }
+                                }
+                                novoStudent.setTurmas(tempaux);
+                                estudantes_.insert(novoStudent);
+                                cout << "Pedido de " << temp.getStudentCode() << " efetuado com sucesso" << endl;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (temp.getType() == "T") {
+                for (TurmaH &turmah: horario_) {
+                    if (turmah.getUcCode() == temp.getUcCode() && turmah.getClassCode() == temp.getFinalClassCode()) {
+                        list<Slot> horarioUc = std::move(turmah.getHorarioUcClass());
+                        for (Slot &horario: horarioUc) {
+                            if (horario.getType() == "TP" || horario.getType() == "PL") {
+                                novaAula = horario;
+                            }
+                        }
+                    }
+                }
+                for (Student student: estudantes_) {
+                    if (temp.getStudentCode() == student.getCode()) {
+                        list<UcTurma> turmas = student.getTurmas();
+                        for (pair<UcTurma, int> &number: numberOfStudentsPerUcTurma_) {
+                            for (pair<UcTurma, int> &number2: numberOfStudentsPerUcTurma_) {
+                                if (number.first.getUcCode() == temp.getUcCode() &&
+                                    number.first.getClassCode() == temp.getFinalClassCode() &&
+                                    number2.first.getUcCode() == temp.getUcCode() &&
+                                    number2.first.getClassCode() == temp.getInitialClassCode()) {
+                                    if (abs((number.second + 1) - (number2.second - 1)) <= 4 && number.second < CAP) {
+                                        for (UcTurma &ucturma: turmas) {
+                                            for (TurmaH &turma: horario_) {
+                                                if ((turma.getUcCode() == ucturma.getUcCode() &&
+                                                    turma.getClassCode() == ucturma.getClassCode()) && ucturma.getUcCode() != temp.getUcCode()) {
+                                                    list<Slot> horarioUc = turma.getHorarioUcClass();
+                                                    for (Slot &aula: horarioUc) {
+                                                        if (aula.getType() == "TP" || aula.getType() == "PL") {
+                                                            if ((aula.getStartHour() == novaAula.getStartHour() &&
+                                                                 aula.getFinalHour() == novaAula.getFinalHour()) ||
+                                                                (aula.getStartHour() < novaAula.getFinalHour() &&
+                                                                 aula.getStartHour() > novaAula.getStartHour()) ||
+                                                                (aula.getFinalHour() < novaAula.getFinalHour() &&
+                                                                 aula.getFinalHour() > novaAula.getStartHour())) {
+                                                                flag = false;
+                                                                counter++;
+                                                                break;
+                                                            }
+                                                            else if (aula.getWeekday() != novaAula.getWeekday()) {
                                                                 flag = true;
+                                                                break;
                                                             }
                                                         }
                                                     }
                                                 }
-                                                else if(turmas.size() == 1){
-                                                    flag = false;
-                                                    a.second--;
-                                                    d.second++;
-                                                    newStudent = i;
-                                                    estudantes_.erase(i);
-                                                    turmas = i.getTurmas();
-                                                    for(auto &turma: turmas) { // percorre a lista de ucturmas do estudante
-                                                        if(turma.getUcCode() == pedido[n].getUcCode() && turma.getClassCode() == pedido[n].getInitialClassCode()) { // verifica se é a ucturma correta
-                                                            turma.setClassCode(pedido[n].getFinalClassCode()); // troca na lista o código da turma
-                                                        }
-                                                    }
-                                                    newStudent.setTurmas(turmas);
-                                                    estudantes_.insert(newStudent);
-                                                    ifs.open("../schedule/students_classes.csv");
-                                                    ofs.open("../schedule/temp.csv");
-                                                    while(getline(ifs, line)){
-                                                        stringstream s(line);
-                                                        getline(s, sstudentCode, ','), getline(s, studentName, ','), getline(s, ucCode, ','), getline(s, classCode, '\r');
-                                                        stringstream conv(sstudentCode);
-                                                        int x = 0;
-                                                        conv >> x;
-                                                        if(x == pedido[n].getStudentCode() && studentName == newStudent.getName() && ucCode == pedido[n].getUcCode() && classCode == pedido[n].getInitialClassCode()){
-                                                            ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode() << endl;
-                                                        }
-                                                        else{
-                                                            ofs << line << '\n';
-                                                        }
-                                                    }
-                                                    remove("../schedule/students_classes.csv");
-                                                    rename("../schedule/temp.csv", "students_classes.csv");
-                                                }
-                                                if(flag){
-                                                    a.second--;
-                                                    d.second++;
-                                                    newStudent = i;
-                                                    estudantes_.erase(i);
-                                                    turmas = i.getTurmas();
-                                                    for(auto &turma: turmas) { // percorre a lista de ucturmas do estudante
-                                                        if(turma.getUcCode() == pedido[n].getUcCode() && turma.getClassCode() == pedido[n].getInitialClassCode()) { // verifica se é a ucturma correta
-                                                            turma.setClassCode(pedido[n].getFinalClassCode()); // troca na lista o código da turma
-                                                        }
-                                                    }
-                                                    newStudent.setTurmas(turmas);
-                                                    estudantes_.insert(newStudent);
-                                                    ifs.open("../schedule/students_classes.csv");
-                                                    ofs.open("../schedule/temp.csv");
-                                                    while(getline(ifs, line)){
-                                                        stringstream s(line);
-                                                        getline(s, sstudentCode, ','), getline(s, studentName, ','), getline(s, ucCode, ','), getline(s, classCode, '\r');
-                                                        stringstream conv(sstudentCode);
-                                                        int x = 0;
-                                                        conv >> x;
-                                                        if(x == pedido[n].getStudentCode() && studentName == newStudent.getName() && ucCode == pedido[n].getUcCode() && classCode == pedido[n].getInitialClassCode()){
-                                                            ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode() << endl;
-                                                        }
-                                                        else{
-                                                            ofs << line << '\n';
-                                                        }
-                                                    }
-                                                    remove("../schedule/students_classes.csv");
-                                                    rename("../schedule/temp.csv", "students_classes.csv");
+                                            }
+                                        }
+                                        if (flag || counter == 0) {
+                                            flag = false;
+                                            novoStudent = student;
+                                            estudantes_.erase(student);
+                                            number.second++;
+                                            number2.second--;
+                                            for (UcTurma &help: turmas) {
+                                                if (help.getUcCode() == temp.getUcCode() &&
+                                                    help.getClassCode() == temp.getInitialClassCode()) {
+                                                    help.setClassCode(temp.getFinalClassCode());
                                                 }
                                             }
+                                            novoStudent.setTurmas(turmas);
+                                            estudantes_.insert(novoStudent);
+                                            cout << "Pedido de " << temp.getStudentCode() << " efetuado com sucesso"
+                                                 << endl;
+                                            break;
                                         }
                                     }
                                 }
@@ -929,126 +903,70 @@ void GestaoH::processarPedidos(){
                     }
                 }
             }
-        }
-        while(n < pedido.size()){
-            if(pedido[n].getType() == "CT"){
-                for(auto& i: estudantes_){
-                    if(pedido[n].getStudentCode() == i.getCode()){
-                        for(auto &a: numberOfStudentsPerUcTurma_){ // preciso de percorrer o vetor 2 vezes
-                            for(auto &d: numberOfStudentsPerUcTurma_){ // uma vez que preciso da turma que o estudante está e aquela para a qual ele quer mudar
-                                if(a.first.getUcCode() == pedido[n].getUcCode() && d.first.getUcCode() == pedido[n].getUcCode() && a.first.getClassCode() == pedido[n].getInitialClassCode() && d.first.getClassCode() == pedido[n].getFinalClassCode()){ // verifica se s é a turma inicial e d a turma final
-                                    if((abs((a.second-1) - (d.second+1)) < 4) && (d.second < CAP)){ // verifica se a diferença entre o número de estudantes depois da mudança é menor que 4 e se a turma onde vai entrar o aluno está abaixo do limite máximo
-                                        turmas = i.getTurmas();
-                                        for(const auto& ucturma: turmas) { // percorre a lista de ucturmas de um estudante
-                                            for(auto &cadeira: horario_) { // percorre as cadeiras no vetor dos horários
-                                                if(ucturma.getUcCode() == cadeira.getUcCode() && ucturma.getClassCode() == cadeira.getClassCode()){ // verifica se é a mesma cadeira e turma e se difere da cadeira que pretendemos mudar
-                                                    horarioUc = cadeira.getHorarioUcClass();
-                                                    if(ucturma.getUcCode() != pedido[n].getUcCode()){
-                                                        for(auto &aula: horarioUc){ // percorre a lista de horários de uma ucturma específica
-                                                            if(aula.getType() == "TP" || aula.getType() == "PL") { // verifica se é a aula teórico-prática ou prática laboratorial
-                                                                if((aula.getWeekday() == novaAula.getWeekday()) && (aula.getStartHour() > novaAula.getFinalHour() || aula.getFinalHour() < novaAula.getStartHour())){ // verifica se é no mesmo dia da semana
-                                                                    flag = false;
-                                                                    a.second--;
-                                                                    d.second++;
-                                                                    newStudent = i;
-                                                                    estudantes_.erase(i);
-                                                                    turmas = i.getTurmas();
-                                                                    for(auto &turma: turmas) { // percorre a lista de ucturmas do estudante
-                                                                        if(turma.getUcCode() == pedido[n].getUcCode() && turma.getClassCode() == pedido[n].getInitialClassCode()) { // verifica se é a ucturma correta
-                                                                            turma.setClassCode(pedido[n].getFinalClassCode()); // troca na lista o código da turma
-                                                                        }
-                                                                    }
-                                                                    newStudent.setTurmas(turmas);
-                                                                    estudantes_.insert(newStudent);
-                                                                    ifs.open("../schedule/students_classes.csv");
-                                                                    ofs.open("../schedule/temp.csv");
-                                                                    while(getline(ifs, line)){
-                                                                        stringstream s(line);
-                                                                        getline(s, sstudentCode, ','), getline(s, studentName, ','), getline(s, ucCode, ','), getline(s, classCode, '\r');
-                                                                        stringstream conv(sstudentCode);
-                                                                        int x = 0;
-                                                                        conv >> x;
-                                                                        if(x == pedido[n].getStudentCode() && studentName == newStudent.getName() && ucCode == pedido[n].getUcCode() && classCode == pedido[n].getInitialClassCode()){
-                                                                            ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode() << endl;
-                                                                        }
-                                                                        else{
-                                                                            ofs << line << '\n';
-                                                                        }
-                                                                    }
-                                                                    remove("../schedule/students_classes.csv");
-                                                                    rename("../schedule/temp.csv", "students_classes.csv");
-                                                                }
-                                                                else if(aula.getWeekday() != novaAula.getWeekday()){
-                                                                    flag = true;
-                                                                }
+            else if(temp.getType() == "CT"){
+                for (TurmaH &turmah: horario_) {
+                    if (turmah.getUcCode() == temp.getUcCode() && turmah.getClassCode() == temp.getFinalClassCode()) {
+                        list<Slot> horarioUc = std::move(turmah.getHorarioUcClass());
+                        for (Slot &horario: horarioUc) {
+                            if (horario.getType() == "TP" || horario.getType() == "PL") {
+                                novaAula = horario;
+                            }
+                        }
+                    }
+                }
+                for (Student student: estudantes_) {
+                    if (temp.getStudentCode() == student.getCode()) {
+                        list<UcTurma> turmas = student.getTurmas();
+                        for (pair<UcTurma, int> &number: numberOfStudentsPerUcTurma_) {
+                            for (pair<UcTurma, int> &number2: numberOfStudentsPerUcTurma_) {
+                                if (number.first.getUcCode() == temp.getUcCode() &&
+                                    number.first.getClassCode() == temp.getFinalClassCode() &&
+                                    number2.first.getUcCode() == temp.getUcCode() &&
+                                    number2.first.getClassCode() == temp.getInitialClassCode()) {
+                                    if (abs((number.second + 1) - (number2.second - 1)) <= 4 && number.second < CAP) {
+                                        for (UcTurma &ucturma: turmas) {
+                                            for (TurmaH &turma: horario_) {
+                                                if ((turma.getUcCode() == ucturma.getUcCode() &&
+                                                     turma.getClassCode() == ucturma.getClassCode()) && ucturma.getUcCode() != temp.getUcCode()) {
+                                                    list<Slot> horarioUc = turma.getHorarioUcClass();
+                                                    for (Slot &aula: horarioUc) {
+                                                        if (aula.getType() == "TP" || aula.getType() == "PL") {
+                                                            if ((aula.getStartHour() == novaAula.getStartHour() &&
+                                                                 aula.getFinalHour() == novaAula.getFinalHour()) ||
+                                                                (aula.getStartHour() < novaAula.getFinalHour() &&
+                                                                 aula.getStartHour() > novaAula.getStartHour()) ||
+                                                                (aula.getFinalHour() < novaAula.getFinalHour() &&
+                                                                 aula.getFinalHour() > novaAula.getStartHour())) {
+                                                                flag = false;
+                                                                counter++;
+                                                                break;
+                                                            }
+                                                            else if (aula.getWeekday() != novaAula.getWeekday()) {
+                                                                flag = true;
+                                                                break;
                                                             }
                                                         }
-                                                    }
-                                                    else if(turmas.size() == 1){
-                                                        flag = false;
-                                                        a.second--;
-                                                        d.second++;
-                                                        newStudent = i;
-                                                        estudantes_.erase(i);
-                                                        turmas = i.getTurmas();
-                                                        for(auto &turma: turmas) { // percorre a lista de ucturmas do estudante
-                                                            if(turma.getUcCode() == pedido[n].getUcCode() && turma.getClassCode() == pedido[n].getInitialClassCode()) { // verifica se é a ucturma correta
-                                                                turma.setClassCode(pedido[n].getFinalClassCode()); // troca na lista o código da turma
-                                                            }
-                                                        }
-                                                        newStudent.setTurmas(turmas);
-                                                        estudantes_.insert(newStudent);
-                                                        ifs.open("../schedule/students_classes.csv");
-                                                        ofs.open("../schedule/temp.csv");
-                                                        while(getline(ifs, line)){
-                                                            stringstream s(line);
-                                                            getline(s, sstudentCode, ','), getline(s, studentName, ','), getline(s, ucCode, ','), getline(s, classCode, '\r');
-                                                            stringstream conv(sstudentCode);
-                                                            int x = 0;
-                                                            conv >> x;
-                                                            if(x == pedido[n].getStudentCode() && studentName == newStudent.getName() && ucCode == pedido[n].getUcCode() && classCode == pedido[n].getInitialClassCode()){
-                                                                ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode() << endl;
-                                                            }
-                                                            else{
-                                                                ofs << line << '\n';
-                                                            }
-                                                        }
-                                                        remove("../schedule/students_classes.csv");
-                                                        rename("../schedule/temp.csv", "students_classes.csv");
-                                                    }
-                                                    if(flag){
-                                                        a.second--;
-                                                        d.second++;
-                                                        newStudent = i;
-                                                        estudantes_.erase(i);
-                                                        turmas = i.getTurmas();
-                                                        for(auto &turma: turmas) { // percorre a lista de ucturmas do estudante
-                                                            if(turma.getUcCode() == pedido[n].getUcCode() && turma.getClassCode() == pedido[n].getInitialClassCode()) { // verifica se é a ucturma correta
-                                                                turma.setClassCode(pedido[n].getFinalClassCode()); // troca na lista o código da turma
-                                                            }
-                                                        }
-                                                        newStudent.setTurmas(turmas);
-                                                        estudantes_.insert(newStudent);
-                                                        ifs.open("../schedule/students_classes.csv");
-                                                        ofs.open("../schedule/temp.csv");
-                                                        while(getline(ifs, line)){
-                                                            stringstream s(line);
-                                                            getline(s, sstudentCode, ','), getline(s, studentName, ','), getline(s, ucCode, ','), getline(s, classCode, '\r');
-                                                            stringstream conv(sstudentCode);
-                                                            int x = 0;
-                                                            conv >> x;
-                                                            if(x == pedido[n].getStudentCode() && studentName == newStudent.getName() && ucCode == pedido[n].getUcCode() && classCode == pedido[n].getInitialClassCode()){
-                                                                ofs << pedido[n].getStudentCode() << ',' << newStudent.getName() << ',' << pedido[n].getUcCode() << ',' << pedido[n].getFinalClassCode() << endl;
-                                                            }
-                                                            else{
-                                                                ofs << line << '\n';
-                                                            }
-                                                        }
-                                                        remove("../schedule/students_classes.csv");
-                                                        rename("../schedule/temp.csv", "students_classes.csv");
                                                     }
                                                 }
                                             }
+                                        }
+                                        if (flag || counter == 0) {
+                                            flag = false;
+                                            novoStudent = student;
+                                            estudantes_.erase(student);
+                                            number.second++;
+                                            number2.second--;
+                                            for (UcTurma &help: turmas) {
+                                                if (help.getUcCode() == temp.getUcCode() &&
+                                                    help.getClassCode() == temp.getInitialClassCode()) {
+                                                    help.setClassCode(temp.getFinalClassCode());
+                                                }
+                                            }
+                                            novoStudent.setTurmas(turmas);
+                                            estudantes_.insert(novoStudent);
+                                            cout << "Pedido de " << temp.getStudentCode() << " efetuado com sucesso"
+                                                 << endl;
+                                            break;
                                         }
                                     }
                                 }
@@ -1057,13 +975,16 @@ void GestaoH::processarPedidos(){
                     }
                 }
             }
-            n++;
+            pedido_.pop();
         }
-        pedido_.pop(); // remove o primeiro elemento da queue
     }
 }
 
-
+/**
+ * Adiciona 1 ao número de elementos de uma unidade curricular e respetiva turma.
+ * Complexidade Temporal O(n)
+ * @param ucTurma
+ */
 void GestaoH::addNumberOfStudentsPerUcTurma(const UcTurma& ucTurma) {
     for (pair<UcTurma, int>& i : numberOfStudentsPerUcTurma_) {
         if (i.first.getUcCode() == ucTurma.getUcCode() && i.first.getClassCode() == ucTurma.getClassCode()) {
@@ -1072,6 +993,11 @@ void GestaoH::addNumberOfStudentsPerUcTurma(const UcTurma& ucTurma) {
     }
 }
 
+/**
+ *
+ * Complexidade Temporal O(n^2)
+ * @return set com todos os estudantes que pertençam ao ano que o utilizador dá input
+ */
 set<Student> GestaoH::studentsPerYear() {
     set<Student> aux;
     string n = "0";
@@ -1092,6 +1018,11 @@ set<Student> GestaoH::studentsPerYear() {
     return aux;
 }
 
+/**
+ *
+ * Complexidade Temporal O(n^2)
+ * @return um set de Estudantes que pertençam a uma unidade curricular que tenha sido dada pelo utilizador
+ */
 set<Student> GestaoH::studentsPerUc() {
     set<Student> aux;
     string uc;
@@ -1111,6 +1042,11 @@ set<Student> GestaoH::studentsPerUc() {
     return aux;
 }
 
+/**
+ *
+ * Complexidade Temporal O(n^2)
+ * @return um set de Estudantes que estejam numa turma na respetiva unidade curricular dadas pelo utilizador
+ */
 set<Student> GestaoH::studentsPerUcPerClass() {
     set<Student> aux;
     string uc, cl_ano, cl_nr;
