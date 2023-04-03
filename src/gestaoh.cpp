@@ -26,7 +26,7 @@ void GestaoH::lerClasses() {
     double startHour, duration;
     Slot aux;
     vector<TurmaH> horario; // criar vetor de ucCode/classCode e uma list<Slot>
-    string ficheiro = "../classes.csv";
+    string ficheiro = "../resources/classes.csv";
     ifstream ifs1, ifs2;
     list<Slot> slot; // criar lista de slots para cada ucCode/classCode
     ifs1.open(ficheiro, ios::in);
@@ -68,7 +68,7 @@ void GestaoH::lerStudentClasses() {
     list<UcTurma> listaUcTurma; // criar lista de ucTurma para cada estudante
     UcTurma ucTurma; // criar UcTurma para cada conjunto de ucCode/classCode
     vector<pair<UcTurma, int>> studentsPerUcTurma;
-    string ficheiro = "../students_classes.csv";
+    string ficheiro = "../resources/students_classes.csv";
     ifstream ifs;
     ifs.open(ficheiro, ios::in); // abre ficheiro
     getline(ifs, temp); // passa a primeira linha à frente
